@@ -4,23 +4,19 @@ import com.word.wordservice.client.LocalWordValidationService;
 import com.word.wordservice.client.OpenAiDictionaryClient;
 import com.word.wordservice.exception.InvalidWordException;
 import com.word.wordservice.model.WordEntry;
-import com.word.wordservice.repository.MediaInfoRepository;
-import com.word.wordservice.repository.WordEntryRepository;
+import com.word.wordservice.repository.GPTWordEntryRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 @Service
 public class WordServiceImpl implements WordService{
-    private final WordEntryRepository wordEntryRepository;
-    private final MediaInfoRepository mediaInfoRepository;
+    private final GPTWordEntryRepository GPTWordEntryRepository;
     private final LocalWordValidationService localWordValidationService;
     private final OpenAiDictionaryClient openAiDictionaryClient;
 
-    public WordServiceImpl(WordEntryRepository wordEntryRepository,
-                           MediaInfoRepository mediaInfoRepository,
+    public WordServiceImpl(GPTWordEntryRepository GPTWordEntryRepository,
                            LocalWordValidationService localWordValidationService,
                            OpenAiDictionaryClient openAiDictionaryClient) {
-        this.wordEntryRepository = wordEntryRepository;
-        this.mediaInfoRepository = mediaInfoRepository;
+        this.GPTWordEntryRepository = GPTWordEntryRepository;
         this.localWordValidationService = localWordValidationService;
         this.openAiDictionaryClient = openAiDictionaryClient;
     }
@@ -31,18 +27,10 @@ public class WordServiceImpl implements WordService{
         if (!localWordValidationService.isValidWord(normalizedWord)) {
             return Mono.error(new InvalidWordException(normalizedWord));
         }
-        return wordEntryRepository.findByWord(normalizedWord)
+        return GPTWordEntryRepository.findByWord(normalizedWord)
                 .switchIfEmpty(
                         openAiDictionaryClient.fetchDictionaryInfo(normalizedWord)
-                                .flatMap(wordEntryRepository::save)
-                )
-                .flatMap(wordEntry ->
-                        mediaInfoRepository.findByWordAndIsPublicTrue(normalizedWord)
-                                .collectList()
-                                .map(mediaInfoList ->{
-                                    wordEntry.setMediaInfoList(mediaInfoList);
-                                    return wordEntry;
-                                })
+                                .flatMap(GPTWordEntryRepository::save)
                 );
     }
 }
