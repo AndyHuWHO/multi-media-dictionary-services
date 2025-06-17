@@ -11,8 +11,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidWordException.class)
     public ResponseEntity<Map<String, String>> handleInvalidWord(InvalidWordException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.badRequest()
+                .body(Map.of("error", ex.getMessage()));
     }
 }
