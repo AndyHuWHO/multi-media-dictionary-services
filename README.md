@@ -8,7 +8,7 @@ A reactive Spring Boot microservices application consisting of:
 
 ### Word Service
 
-Manages dictionary words, definitions, and multimedia content.
+Provides dictionary words definitions through LLM.
 
 **Environment Variables:**
 - `spring.data.mongodb.uri`: MongoDB connection URI (required)
