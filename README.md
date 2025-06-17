@@ -23,6 +23,7 @@ docker run -p 8080:8080 \
   --env openai.api.key="your-api-key" \
   --env openai.model="gpt-4.1" \
   word-service
+```
 
 ### User service
 
