@@ -20,7 +20,7 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${jwt.secret}") String jwtSecret) {
         System.out.println(Arrays.toString(jwtSecret.getBytes(StandardCharsets.UTF_8)));
-        this.key = Keys.hmacShaKeyFor(Arrays.toString(jwtSecret.getBytes(StandardCharsets.UTF_8)).getBytes());
+//        this.key = Keys.hmacShaKeyFor(Arrays.toString(jwtSecret.getBytes(StandardCharsets.UTF_8)).getBytes());
 //        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 //        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 //        byte[] keyBytes = Base64.getDecoder()
@@ -31,7 +31,7 @@ public class JwtUtil {
 //        this.key = Keys.hmacShaKeyFor(keyBytes);
 //        jwtSecret = jwtSecret.trim().replace("\"", "")       // Remove quotes
 //                .replace("'", "");
-//        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 
