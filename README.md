@@ -1,18 +1,25 @@
-Reactive Springboot micro-services for a multi-media dictionary application
+# Multimedia Dictionary Application
 
-Word-service:
-  env vars needed: 1. spring.data.mongodb.uri 2. openai.api.key  3. openai.model (optional, default is gpt-4.1)
-  dockerfile available, to run in docker:
-  docker build -t your-app-name .
-  docker run -p 8080:8080 \
+A reactive Spring Boot microservices application consisting of:
+- Word Service: Manages dictionary entries with AI-powered definitions
+- User Service: Handles user authentication and profiles
+
+## Services
+
+### Word Service
+
+Manages dictionary words, definitions, and multimedia content.
+
+**Environment Variables:**
+- `spring.data.mongodb.uri`: MongoDB connection URI (required)
+- `openai.api.key`: OpenAI API key (required)
+- `openai.model`: OpenAI model name (optional, default: "gpt-4.1")
+
+**Docker Deployment:**
+```bash
+docker build -t word-service .
+docker run -p 8080:8080 \
   --env spring.data.mongodb.uri="mongodb://host:port/db" \
   --env openai.api.key="your-api-key" \
   --env openai.model="gpt-4.1" \
-  your-app-name
-
-
-
-
-User-service: 
-    to run:  ./mvnw clean install        
-    then   ./mvnw spring-boot:run
+  word-service
