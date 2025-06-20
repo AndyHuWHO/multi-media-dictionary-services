@@ -14,7 +14,7 @@ import java.util.List;
 public class WordEntry {
     @Id
     private String id;
-    @Indexed
+    @Indexed(unique = true)
     private String word;
     private List<DictionaryInfo> dictionaryInfoList;
 

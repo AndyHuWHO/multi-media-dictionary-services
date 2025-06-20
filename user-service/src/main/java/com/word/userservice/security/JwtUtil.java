@@ -20,11 +20,11 @@ public class JwtUtil {
     public JwtUtil(@Value("${jwt.secret}") String jwtSecret) {
 //        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 //        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-//        byte[] keyBytes = Base64.getDecoder()
-//                .decode(jwtSecret.trim());
-//        this.key = Keys.hmacShaKeyFor(keyBytes);
-
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        byte[] keyBytes = Base64.getDecoder()
+                .decode(jwtSecret.trim());
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+        System.out.println("jwtSecret: " + jwtSecret);
+//        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 
