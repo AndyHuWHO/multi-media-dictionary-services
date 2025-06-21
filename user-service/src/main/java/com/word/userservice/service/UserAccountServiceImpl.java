@@ -11,6 +11,7 @@ import com.word.userservice.model.UserAccount;
 import com.word.userservice.model.UserRole;
 import com.word.userservice.repository.UserAccountRepository;
 import com.word.userservice.security.JwtUtil;
+import com.word.userservice.security.TokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +21,14 @@ import java.util.UUID;
 public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+//    private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
-    public UserAccountServiceImpl(UserAccountRepository userAccountRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserAccountServiceImpl(UserAccountRepository userAccountRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
+//        this.jwtUtil = jwtUtil;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -61,11 +64,7 @@ public class UserAccountServiceImpl implements UserAccountService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(
-                user.getPublicId(),
-                user.getEmail(),
-                user.getRole().name()
-        );
+        String token = tokenService.generateToken(user);
 
         return LoginResponseDTO.builder()
                 .publicId(user.getPublicId())
