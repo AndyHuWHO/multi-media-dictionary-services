@@ -34,7 +34,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get-member")
+    @PostMapping("/get-member")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LoginResponseDTO> getMembership(
             @RequestBody GetMembershipRequestDTO request,
