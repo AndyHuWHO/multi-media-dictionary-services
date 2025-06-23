@@ -42,11 +42,11 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user-auth",
-                                "/api/user-auth/login",
-                                "/api/user-auth/register").permitAll()
-                        .requestMatchers("/api/user-auth/profile").authenticated()
-                        .requestMatchers("/api/user-auth/user").hasRole( "USER")
+                        .requestMatchers("/api/auth",
+                                "/api/auth/login",
+                                "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/profile").authenticated()
+                        .requestMatchers("/api/auth/user").hasRole( "USER")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
