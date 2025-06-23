@@ -76,7 +76,7 @@ Authenticates a user and returns a JWT.
 #### `POST /api/user-auth/get-membership`
 
 **Description:**  
-Upgrade user role to `ROLE_MEMBER` using the upgrade code `VIP123`.
+Upgrade user role to `MEMBER` using the upgrade code `VIP123`.
 
 **Authorization:**  
 Requires Bearer JWT token.
