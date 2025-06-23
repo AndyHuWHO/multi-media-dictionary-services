@@ -78,14 +78,11 @@ public class SecurityConfig {
     public AuthenticationEntryPoint customAuthenticationEntryPoint() {
         return (request, response, authException) -> {
             Throwable cause = authException.getCause();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
             if (cause instanceof JwtException) {
-                System.out.println("JWT validation error: " + cause.getMessage());
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"Invalid token\"}");
             } else {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"Authentication required\"}");
             }
         };
