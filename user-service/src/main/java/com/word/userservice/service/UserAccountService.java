@@ -9,4 +9,5 @@ public interface UserAccountService {
     RegistrationResponseDTO registerUser(RegistrationRequestDTO registrationRequestDTO);
     LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO);
 
+    LoginResponseDTO upgradeUser(String publicId, String upgradeCode);
 }

@@ -1,16 +1,16 @@
 package com.word.userservice.controller;
 
-import com.word.userservice.dto.LoginRequestDTO;
-import com.word.userservice.dto.LoginResponseDTO;
-import com.word.userservice.dto.RegistrationRequestDTO;
-import com.word.userservice.dto.RegistrationResponseDTO;
+import com.word.userservice.dto.*;
 import com.word.userservice.service.UserAccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/user-auth")
 public class AuthController {
     private final UserAccountService userAccountService;
 
@@ -33,4 +33,27 @@ public class AuthController {
         LoginResponseDTO response = userAccountService.loginUser(loginRequestDTO);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/get-member")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<LoginResponseDTO> getMembership(
+            @RequestBody GetMembershipRequestDTO request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        LoginResponseDTO response = userAccountService
+                .upgradeUser(jwt.getSubject(), request.getUpgradeCode());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/profile")
+    public String test() {return "you are logged in";}
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public String userAuthorized() {return "you are logged in as a user";}
+
+
+    @GetMapping("/member")
+    @PreAuthorize("hasAuthority('ROLE_MEMBER')")
+    public String memberAuthorized() {return "you are logged in as a MEMBER";}
 }

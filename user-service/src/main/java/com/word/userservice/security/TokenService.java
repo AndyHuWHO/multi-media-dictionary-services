@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TokenService {
@@ -30,6 +31,7 @@ public class TokenService {
                     .expirationTime(Date.from(now.plusSeconds(3600)))
                     .claim("email", user.getEmail())
                     .claim("role", user.getRole().name())
+//                    .claim("scope", List.of("SCOPE_" + user.getRole().name()))
                     .build();
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
                     .type(JOSEObjectType.JWT)

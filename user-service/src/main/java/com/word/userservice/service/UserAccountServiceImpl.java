@@ -6,6 +6,7 @@ import com.word.userservice.dto.RegistrationRequestDTO;
 import com.word.userservice.dto.RegistrationResponseDTO;
 import com.word.userservice.exception.EmailAlreadyExistsException;
 import com.word.userservice.exception.InvalidCredentialsException;
+import com.word.userservice.exception.ResourceNotFoundException;
 import com.word.userservice.model.AuthProvider;
 import com.word.userservice.model.UserAccount;
 import com.word.userservice.model.UserRole;
@@ -71,6 +72,34 @@ public class UserAccountServiceImpl implements UserAccountService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .token(token)
+                .build();
+    }
+
+    @Override
+    public LoginResponseDTO upgradeUser(String publicId, String upgradeCode) {
+        final String correctCode = "VIP123";
+
+        if (!correctCode.equals(upgradeCode)) {
+            throw new InvalidCredentialsException("Invalid upgrade code");
+        }
+
+        UserAccount user = userAccountRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for id: " + publicId));
+
+        if (user.getRole() == UserRole.MEMBER) {
+            throw new IllegalStateException("User is already a member");
+        }
+
+        user.setRole(UserRole.MEMBER);
+        userAccountRepository.save(user);
+
+        String newToken = tokenService.generateToken(user);
+
+        return LoginResponseDTO.builder()
+                .publicId(user.getPublicId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .token(newToken)
                 .build();
     }
 }
