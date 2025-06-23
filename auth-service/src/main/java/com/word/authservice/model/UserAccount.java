@@ -10,11 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "user_accounts",
-        indexes = {
-                @Index(name = "idx_user_email", columnList = "email"),
-                @Index(name = "idx_user_public_id", columnList = "publicId")
-        })
+@Table(name = "user_accounts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

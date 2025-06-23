@@ -21,13 +21,13 @@ import java.util.UUID;
 public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
-//    private final JwtUtil jwtUtil;
     private final TokenService tokenService;
 
-    public UserAccountServiceImpl(UserAccountRepository userAccountRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
+    public UserAccountServiceImpl(UserAccountRepository userAccountRepository,
+                                  PasswordEncoder passwordEncoder,
+                                  TokenService tokenService) {
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
-//        this.jwtUtil = jwtUtil;
         this.tokenService = tokenService;
     }
 
@@ -83,7 +83,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         }
 
         UserAccount user = userAccountRepository.findByPublicId(publicId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for id: " + publicId));
+                .orElseThrow(() -> new ResourceNotFoundException("User id not found"));
 
         if (user.getRole() == UserRole.MEMBER) {
             throw new IllegalStateException("User is already a member");
