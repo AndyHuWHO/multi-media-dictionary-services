@@ -17,6 +17,7 @@ public class AuthController {
     public AuthController(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
     }
+
     @GetMapping("")
     public String welcome() {return "Welcome to MVP auth service api!";}
 
