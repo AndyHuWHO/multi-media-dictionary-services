@@ -1,9 +1,6 @@
 package com.word.authservice.service;
 
-import com.word.authservice.dto.LoginRequestDTO;
-import com.word.authservice.dto.LoginResponseDTO;
-import com.word.authservice.dto.RegistrationRequestDTO;
-import com.word.authservice.dto.RegistrationResponseDTO;
+import com.word.authservice.dto.*;
 import com.word.authservice.exception.EmailAlreadyExistsException;
 import com.word.authservice.exception.InvalidCredentialsException;
 import com.word.authservice.exception.ResourceNotFoundException;
@@ -12,8 +9,13 @@ import com.word.authservice.model.UserAccount;
 import com.word.authservice.model.UserRole;
 import com.word.authservice.repository.UserAccountRepository;
 import com.word.authservice.security.TokenService;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
@@ -22,13 +24,15 @@ public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final RestTemplate restTemplate;
 
     public UserAccountServiceImpl(UserAccountRepository userAccountRepository,
                                   PasswordEncoder passwordEncoder,
-                                  TokenService tokenService) {
+                                  TokenService tokenService, RestTemplate restTemplate) {
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -47,6 +51,22 @@ public class UserAccountServiceImpl implements UserAccountService {
                 .build();
 
         UserAccount savedUserAccount = userAccountRepository.save(userAccount);
+
+
+        // 3. Call User Service to create profile (LOCAL URL)
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Auth-UserId", savedUserAccount.getPublicId());
+
+        ResponseEntity<UserProfileResponseDTO> response = restTemplate.exchange(
+                "http://localhost:8082/api/user/profile", // Update port as needed!
+                HttpMethod.POST,
+                new HttpEntity<>(headers),
+                UserProfileResponseDTO.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to create user profile!");
+        }
         return RegistrationResponseDTO.builder()
                 .publicId(savedUserAccount.getPublicId())
                 .email(savedUserAccount.getEmail())
