@@ -1,9 +1,15 @@
 # 📚 Multimedia Dictionary Application
+![Multimedia Dictionary Architecture](./assets/architecture.png)
 
 A reactive Spring Boot microservices application consisting of:
 
 - **Word Service**: Manages dictionary entries with AI-powered definitions
 - **Auth Service**: Handles user authentication and authorization
+- **User Service**: Handles user profile management and user vocabulary notebook management
+- **Media Service**: Handles media uploading and steaming logic
+- **Media-Metadata Service**: Handles media meta-data management
+- **API GATEWAY**: Handles auth verification and traffic routing
+
 
 ---
 
