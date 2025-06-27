@@ -9,6 +9,7 @@ import com.word.authservice.model.UserAccount;
 import com.word.authservice.model.UserRole;
 import com.word.authservice.repository.UserAccountRepository;
 import com.word.authservice.security.TokenService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,9 @@ public class UserAccountServiceImpl implements UserAccountService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final RestTemplate restTemplate;
+
+    @Value("${user.service.url}")
+    private String userServiceUrl;
 
     public UserAccountServiceImpl(UserAccountRepository userAccountRepository,
                                   PasswordEncoder passwordEncoder,
@@ -58,7 +62,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         headers.set("X-Auth-UserId", savedUserAccount.getPublicId());
 
         ResponseEntity<UserProfileResponseDTO> response = restTemplate.exchange(
-                "http://localhost:8082/api/user/profile", // Update port as needed!
+                userServiceUrl, // Update port as needed!
                 HttpMethod.POST,
                 new HttpEntity<>(headers),
                 UserProfileResponseDTO.class

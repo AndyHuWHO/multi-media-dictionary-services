@@ -17,6 +17,7 @@ public class JwtConfig {
     private SecretKey secretKey;
     @PostConstruct
     public void init() {
+        System.out.println("Secret:" + secret);
         byte[] keyBytes = Base64.getDecoder().decode(secret);
         this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
