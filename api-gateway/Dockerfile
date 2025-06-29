@@ -13,5 +13,5 @@ WORKDIR /app
 # Copy the built artifact from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8083
-ENTRYPOINT ["java", "-jar", "app.jar"] 
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

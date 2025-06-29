@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # 🔐 PostgreSQL for Auth Service
+  postgres-auth:
+    image: postgres:15
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: auth_service_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # 👤 PostgreSQL for User Service
+  postgres-user:
+    image: postgres:15
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB: user_service_db
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # 📚 MongoDB for Word Service
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  # 🔐 Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_service_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_pass
+      JWT_SECRET: ${JWT_SECRET}
+      USER_SERVICE_URL: http://user-service:8082
+    depends_on:
+      - postgres-auth
+    networks:
+      - backend
+
+  # 👤 User Service
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_service_db
+      SPRING_DATASOURCE_USERNAME: user_user
+      SPRING_DATASOURCE_PASSWORD: user_pass
+    depends_on:
+      - postgres-user
+    networks:
+      - backend
+
+  # 📚 Word Service
+  word-service:
+    build:
+      context: ./word-service
+    container_name: word-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/wordservice
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - backend
+
+  # 🚪 API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      auth.url: http://auth-service:8081
+      user.url: http://user-service:8082
+      word.url: http://word-service:8083
+    depends_on:
+      - auth-service
+      - user-service
+      - word-service
+    networks:
+      - backend
+
+volumes:
+  postgres-auth-data:
+  postgres-user-data:
+  mongodb_data:
+networks:
+  backend:
+    driver: bridge

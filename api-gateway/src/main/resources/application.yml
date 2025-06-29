@@ -2,24 +2,32 @@ server:
   port: 8080
 jwt:
   secret: ${JWT_SECRET:RRB0+Gr6EGjziACoFoKUWeSJQzIGfxTaGNplpO0tkNY=}
+
+auth:
+  url: http://localhost:8081
+word:
+  url: http://localhost:8083
+user:
+  url: http://localhost:8082
+
 spring:
   application:
     name: api-gateway
 
-  cloud:
-    gateway:
-      server:
-        webflux:
-          routes:
-            - id: word-service
-              uri: http://localhost:8083
-              predicates:
-                - Path=/api/words/**
-            - id: auth-service
-              uri: http://localhost:8081
-              predicates:
-                - Path=/api/auth/**
-            - id: user-service
-              uri: http://localhost:8082
-              predicates:
-                - Path=/api/user/**
+#  cloud:
+#    gateway:
+#      server:
+#        webflux:
+#          routes:
+#            - id: word-service
+#              uri: http://localhost:8083
+#              predicates:
+#                - Path=/api/words/**
+#            - id: auth-service
+#              uri: http://localhost:8081
+#              predicates:
+#                - Path=/api/auth/**
+#            - id: user-service
+#              uri: http://localhost:8082
+#              predicates:
+#                - Path=/api/user/**

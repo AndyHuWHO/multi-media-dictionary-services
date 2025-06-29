@@ -21,18 +21,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<?> handleInvalidCredentials(InvalidCredentialsException ex) {
+        System.out.println("the handleInvalidCredentials exception is called");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> handleIllegalStateException(IllegalStateException ex) {
+        System.out.println("the handleIllegalStateException exception is called");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        System.out.println("the handleAuthorizationDenied exception is called");
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(Map.of("error", ex.getMessage()));

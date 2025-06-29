@@ -62,7 +62,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         headers.set("X-Auth-UserId", savedUserAccount.getPublicId());
 
         ResponseEntity<UserProfileResponseDTO> response = restTemplate.exchange(
-                userServiceUrl, // Update port as needed!
+                userServiceUrl + "/api/user/profile", // Update port as needed!
                 HttpMethod.POST,
                 new HttpEntity<>(headers),
                 UserProfileResponseDTO.class

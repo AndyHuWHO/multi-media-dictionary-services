@@ -31,6 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> loginUser(
             @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        System.out.println("hit auth service login endpoint");
         LoginResponseDTO response = userAccountService.loginUser(loginRequestDTO);
         return ResponseEntity.ok(response);
     }
