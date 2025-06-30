@@ -3,6 +3,8 @@ package com.word.userservice.controller;
 import com.word.userservice.dto.WordNoteRequestDTO;
 import com.word.userservice.dto.WordNoteResponseDTO;
 import com.word.userservice.service.WordNoteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/notebooks/{notebookId}/notes")
+@Tag(name = "Word Notes", description = "Word Notes API")
 public class WordNoteController {
     private final WordNoteService wordNoteService;
 
@@ -21,6 +24,7 @@ public class WordNoteController {
     }
 
     @GetMapping
+    @Operation(summary = "Get word notes paginated")
     public ResponseEntity<Page<WordNoteResponseDTO>> getNotes(
             @PathVariable Long notebookId,
             @RequestHeader("X-Auth-UserId") String authUserId,
@@ -29,6 +33,7 @@ public class WordNoteController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all word notes")
     public ResponseEntity<List<WordNoteResponseDTO>> getAllNotes(
             @PathVariable Long notebookId,
             @RequestHeader("X-Auth-UserId") String authUserId) {
@@ -36,6 +41,7 @@ public class WordNoteController {
     }
 
     @PostMapping
+    @Operation(summary = "Create a new word note")
     public ResponseEntity<WordNoteResponseDTO> createNote(
             @PathVariable Long notebookId,
             @RequestHeader("X-Auth-UserId") String authUserId,
@@ -44,6 +50,7 @@ public class WordNoteController {
     }
 
     @PatchMapping("/{noteId}")
+    @Operation(summary = "Update a word note")
     public ResponseEntity<WordNoteResponseDTO> updateNote(
             @PathVariable Long noteId,
             @RequestHeader("X-Auth-UserId") String authUserId,
@@ -52,6 +59,7 @@ public class WordNoteController {
     }
 
     @DeleteMapping("/{noteId}")
+    @Operation(summary = "Delete a word note")
     public ResponseEntity<Void> deleteNote(
             @PathVariable Long noteId,
             @RequestHeader("X-Auth-UserId") String authUserId) {

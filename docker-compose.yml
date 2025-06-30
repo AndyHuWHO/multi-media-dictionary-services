@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 🔐 PostgreSQL for Auth Service
+  # PostgreSQL for Auth Service
   postgres-auth:
     image: postgres:15
     container_name: postgres-auth
@@ -16,7 +16,7 @@ services:
     networks:
       - backend
 
-  # 👤 PostgreSQL for User Service
+  # PostgreSQL for User Service
   postgres-user:
     image: postgres:15
     container_name: postgres-user
@@ -31,18 +31,18 @@ services:
     networks:
       - backend
 
-  # 📚 MongoDB for Word Service
+  # MongoDB for Word Service
   mongodb:
-    image: mongo:6
+    image: mongo:8
     container_name: mongodb
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
       - backend
 
-  # 🔐 Auth Service
+  # Auth Service
   auth-service:
     build:
       context: ./auth-service
@@ -58,7 +58,7 @@ services:
     networks:
       - backend
 
-  # 👤 User Service
+  # User Service
   user-service:
     build:
       context: ./user-service
@@ -72,7 +72,7 @@ services:
     networks:
       - backend
 
-  # 📚 Word Service
+  # Word Service
   word-service:
     build:
       context: ./word-service
@@ -85,7 +85,7 @@ services:
     networks:
       - backend
 
-  # 🚪 API Gateway
+  # API Gateway
   api-gateway:
     build:
       context: ./api-gateway

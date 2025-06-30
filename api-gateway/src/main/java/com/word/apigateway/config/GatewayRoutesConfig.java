@@ -37,6 +37,14 @@ public class GatewayRoutesConfig {
                 .route("user-service", r -> r
                         .path("/api/user/**")
                         .uri(userServiceUrl))
+                .route("word-docs", r -> r
+                        .path("/word/v3/api-docs")
+                        .filters(f -> f.rewritePath("/word/(.*)", "/$1"))
+                        .uri(userServiceUrl))
+                .route("user-docs", r -> r
+                        .path("/user/v3/api-docs")
+                        .filters(f -> f.rewritePath("/user/(.*)", "/$1"))
+                        .uri(userServiceUrl))
                 .build();
     }
 }
