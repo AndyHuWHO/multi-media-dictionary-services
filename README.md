@@ -149,7 +149,9 @@ docker compose up --build
 
 ## 👤 User Profile and Notes (`/api/user`)
 
-### `GET /profile` — Get user profile
+---
+### Profile (`/profile`)
+#### `GET` — Get user profile
 
 **Response Example:**
 ```json
@@ -163,7 +165,7 @@ docker compose up --build
 }
 ```
 
-### `POST /profile` — Create profile
+#### `POST` — Create profile
 
 **Response Example:**
 ```json
@@ -177,7 +179,7 @@ docker compose up --build
 }
 ```
 
-### `PATCH /profile` — Update profile
+#### `PATCH` — Update profile
 
 **Request Example:**
 ```json
