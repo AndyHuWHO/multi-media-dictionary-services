@@ -4,67 +4,379 @@
 A reactive Spring Boot microservices application consisting of:
 
 - **Word Service**: Manages dictionary entries with AI-powered definitions
-- **Auth Service**: Handles user authentication and authorization
+- **Auth Service**: Handles user authentication and authorization (migrate to keycloak later)
 - **User Service**: Handles user profile management and user vocabulary notebook management
-- **Media Service**: Handles media acquiring pre-signed upload url from S3 and saving media-metadata
-- **Media-After-Service**: Handles media format transformation, compression, etc.
-- **API GATEWAY**: Handles auth verification and traffic routing
+- **Media Service**: Handles acquiring pre-signed media upload url from S3 and saving media-metadata
+- **Media-After-Service**: Handles media format transformation, compression, etc. and media is uploaded to S3 from frontend
+- **API GATEWAY**: Handles auth verification (with auth service or keycloak) and authorization-based traffic routing
 
 
 ---
 
 ### 🐳 Docker Compose
-Make sure environment variables in the docker compose file are provided
+Make sure environment variables in the docker compose file are provided: OPENAI_API_KEY, JWT_SECRET
 ```bash
 docker compose up --build
 ```
 
+---
 
 ## 🔐 Auth Endpoints (`/api/auth`)
 
-- `GET /` — Welcome message
-- `POST /register` — Register a new user
-- `POST /login` — Login and receive JWT
-- `POST /get-member` — Upgrade user to MEMBER (requires JWT)
-- `GET /profile` — Get current user's profile (requires JWT)
-- `GET /user` — Check access as USER role
-- `GET /member` — Check access as MEMBER role
+### `POST /register` — Register a new user
+
+**Request Example:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123",
+  "authProvider": "REGISTRATION"
+}
+```
+
+**Response Example:**
+```json
+{
+  "publicId": "abc123",
+  "email": "user@example.com",
+  "role": "USER",
+  "createdAt": "2025-07-01T12:00:00Z"
+}
+```
+
+---
+
+### `POST /login` — Login and receive JWT
+
+**Request Example:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+**Response Example:**
+```json
+{
+  "publicId": "abc123",
+  "email": "user@example.com",
+  "role": "USER",
+  "token": "jwt.token.here"
+}
+```
+
+---
+
+### `POST /get-member` — Upgrade USER to MEMBER
+
+**Request Example:**
+```json
+{
+  "upgradeCode": "VIP123"
+}
+```
+
+**Response Example:**
+```json
+{
+  "publicId": "abc123",
+  "email": "user@example.com",
+  "role": "MEMBER",
+  "token": "new.jwt.token"
+}
+```
+
+---
+
+### `GET /profile` — Confirm user is authenticated
+
+**Response Example:**
+```json
+"User is authenticated"
+```
+
+---
+
+### `GET /user` — Check access as a USER role
+
+**Response Example:**
+```json
+"Access granted: USER"
+```
+
+---
+
+### `GET /member` — Check access as a MEMBER role
+
+**Response Example:**
+```json
+"Access granted: MEMBER"
+```
 
 ---
 
 ## 📘 Dictionary Endpoints (`/api/words`)
 
-- `GET /` — Welcome message
-- `GET /{word}` — Get detailed dictionary entry for a word
+### `GET /{word}` — Get detailed dictionary entry for a word
+
+**Response Example:**
+```json
+{
+  "id": "1",
+  "word": "hello",
+  "dictionaryInfoList": [
+    {
+      "partOfSpeech": "interjection",
+      "pronunciation": {
+        "uk": "həˈləʊ",
+        "us": "həˈloʊ"
+      },
+      "wordSenseList": [
+        {
+          "definitionEn": "A greeting",
+          "translationZh": "你好",
+          "sampleExpressions": ["Hello there!"],
+          "sampleSentences": ["She said hello as she walked in."]
+        }
+      ]
+    }
+  ]
+}
+```
 
 ---
 
 ## 👤 User Profile and Notes (`/api/user`)
 
-### Profile (`/profile`)
-- `GET` — Get user profile (header: `X-Auth-UserId`)
-- `POST` — Create profile
-- `PATCH` — Update profile
+### `GET /profile` — Get user profile
 
-### Notebooks (`/notebooks`)
-- `GET` — Get user notebooks
-- `POST` — Create a notebook
-- `PATCH /{notebookId}` — Update a notebook
-- `DELETE /{notebookId}` — Delete a notebook
+**Response Example:**
+```json
+{
+  "profileName": "JohnDoe",
+  "bio": "Language enthusiast",
+  "profileImageUrl": "http://example.com/image.png",
+  "gender": "MALE",
+  "dateCreated": "2025-07-01T12:00:00Z",
+  "dateUpdated": "2025-07-01T12:00:00Z"
+}
+```
 
-### Word Notes (`/notebooks/{notebookId}/notes`)
-- `GET` — Paginated notes (`pageable` query param)
-- `POST` — Add a new note
-- `PATCH /{noteId}` — Update note
-- `DELETE /{noteId}` — Delete note
-- `GET /all` — Get all notes in a notebook
+### `POST /profile` — Create profile
 
-> ⚠️ All endpoints in User Profile & Notes require header: `X-Auth-UserId`
+**Response Example:**
+```json
+{
+  "profileName": "JohnDoe",
+  "bio": "Language enthusiast",
+  "profileImageUrl": "http://example.com/image.png",
+  "gender": "MALE",
+  "dateCreated": "2025-07-01T12:00:00Z",
+  "dateUpdated": "2025-07-01T12:00:00Z"
+}
+```
 
+### `PATCH /profile` — Update profile
+
+**Request Example:**
+```json
+{
+  "profileName": "JaneDoe",
+  "bio": "Loves languages and travel",
+  "gender": "FEMALE"
+}
+```
+
+**Response Example:**
+```json
+{
+  "profileName": "JaneDoe",
+  "bio": "Loves languages and travel",
+  "profileImageUrl": "http://example.com/image.png",
+  "gender": "FEMALE",
+  "dateCreated": "2025-07-01T12:00:00Z",
+  "dateUpdated": "2025-07-01T12:05:00Z"
+}
+```
+
+---
+### Notebooks (`/notebooks`) 
+(needs MEMBER ROLE)
+
+#### `GET` — Get user notebooks
+
+**Response Example:**
+```json
+[
+  {
+    "notebookId": 1,
+    "title": "My Vocabulary",
+    "dateCreated": "2025-07-01T12:00:00Z",
+    "dateUpdated": "2025-07-01T12:00:00Z"
+  }
+]
+```
+
+#### `POST` — Create a notebook
+
+**Request Example:**
+```json
+{
+  "title": "New Words"
+}
+```
+
+**Response Example:**
+```json
+{
+  "notebookId": 2,
+  "title": "New Words",
+  "dateCreated": "2025-07-01T12:10:00Z",
+  "dateUpdated": "2025-07-01T12:10:00Z"
+}
+```
+
+#### `PATCH /{notebookId}` — Update a notebook
+
+**Request Example:**
+```json
+{
+  "title": "Updated Notebook Title"
+}
+```
+
+**Response Example:**
+```json
+{
+  "notebookId": 2,
+  "title": "Updated Notebook Title",
+  "dateCreated": "2025-07-01T12:10:00Z",
+  "dateUpdated": "2025-07-01T12:15:00Z"
+}
+```
+
+#### `DELETE /{notebookId}` — Delete a notebook
+
+**Response Example:**
+```json
+"Notebook deleted successfully"
+```
+
+---
+
+### Word Notes (`/notebooks/{notebookId}/notes`) 
+(needs MEMBER ROLE)
+
+#### `GET` — Paginated notes (`pageable` query param)
+
+**Request Example:**
+```
+GET /api/user/notebooks/1/notes?pageable.page=0&pageable.size=10
+
+```
+
+**Response Example:**
+```json
+{
+  "totalPages": 1,
+  "totalElements": 1,
+  "first": true,
+  "last": true,
+  "size": 10,
+  "content": [
+    {
+      "noteId": 1,
+      "word": "elucidate",
+      "content": "To make clear",
+      "dateCreated": "2025-07-01T12:20:00Z",
+      "dateUpdated": "2025-07-01T12:20:00Z"
+    }
+  ],
+  "number": 0,
+  "numberOfElements": 1,
+  "empty": false
+}
+```
+
+#### `POST` — Add a new note
+
+**Request Example:**
+```json
+{
+  "word": "ephemeral",
+  "content": "Short-lived; transient"
+}
+```
+
+**Response Example:**
+```json
+{
+  "noteId": 2,
+  "word": "ephemeral",
+  "content": "Short-lived; transient",
+  "dateCreated": "2025-07-01T12:25:00Z",
+  "dateUpdated": "2025-07-01T12:25:00Z"
+}
+```
+
+#### `PATCH /{noteId}` — Update note
+
+**Request Example:**
+```json
+{
+  "word": "ephemeral",
+  "content": "Lasting for a very short time"
+}
+```
+
+**Response Example:**
+```json
+{
+  "noteId": 2,
+  "word": "ephemeral",
+  "content": "Lasting for a very short time",
+  "dateCreated": "2025-07-01T12:25:00Z",
+  "dateUpdated": "2025-07-01T12:30:00Z"
+}
+```
+
+#### `DELETE /{noteId}` — Delete note
+
+**Response Example:**
+```json
+"Note deleted successfully"
+```
+
+#### `GET /all` — Get all notes in a notebook
+
+**Response Example:**
+```json
+[
+  {
+    "noteId": 1,
+    "word": "elucidate",
+    "content": "To make clear",
+    "dateCreated": "2025-07-01T12:20:00Z",
+    "dateUpdated": "2025-07-01T12:20:00Z"
+  },
+  {
+    "noteId": 2,
+    "word": "ephemeral",
+    "content": "Short-lived; transient",
+    "dateCreated": "2025-07-01T12:25:00Z",
+    "dateUpdated": "2025-07-01T12:25:00Z"
+  }
+]
+```
+
+
+---
 
 ## 🧠 Word Service
 
-Provides dictionary word definitions powered by a large language model (LLM).
+Provides dictionary word definitions powered by a large language model (LLM). Could be hosted individually 
+as a dictionary database builder.
 
 ### 🔧 Environment Variables
 
@@ -92,97 +404,6 @@ Retrieve dictionary information for the specified word.
 
 ---
 
-## 🔐 Auth Service
-
-Handles user registration, authentication, role-based authorization, and user-role management.
-
-### ▶️ Local Run Instructions
-
-```bash
-./mvnw clean install
-./mvnw spring-boot:run
-```
-
-**Base URL:** `/api/user-auth`
-
-### 📘 Endpoints
-
-#### `GET /api/auth`
-**Description:**  
-Returns a welcome message.
-
----
-
-#### `POST /api/auth/register`
-**Description:**  
-Registers a new user.  
-**Request Body:**  
-```json
-{
-  "email": "user@example.com",
-  "password": "yourPassword",
-  "authProvider": "REGISTRATION"
-}
-```
-**Response:**  
-Returns user public ID, email, role, and creation timestamp.
-
----
-
-#### `POST /api/auth/login`
-**Description:**  
-Authenticates a user and returns a JWT.  
-**Request Body:**  
-```json
-{
-  "email": "user@example.com",
-  "password": "yourPassword"
-}
-```
-**Response:**  
-Returns user public ID, email, role, and JWT token.
-
----
-
-#### `POST /api/auth/get-member`
-**Description:**  
-Upgrade user role to `MEMBER` using an upgrade code.  
-**Request Body:**  
-```json
-{
-  "upgradeCode": "VIP123"
-}
-```
-**Authorization:**  
-Requires Bearer JWT token.  
-**Response:**  
-Returns updated user info and new JWT token.
-
----
-
-#### `GET /api/auth/profile`
-**Description:**  
-Fetch the authenticated user's profile.  
-**Authorization:**  
-Requires Bearer JWT token.
-
----
-
-#### `GET /api/auth/user`
-**Description:**  
-Accessible only by users with role `USER`.  
-**Authorization:**  
-Requires Bearer JWT token with role `USER`.
-
----
-
-#### `GET /api/auth/member`
-**Description:**  
-Accessible only by users with role `MEMBER`.  
-**Authorization:**  
-Requires Bearer JWT token with role `MEMBER`.
-
----
 
 
 
