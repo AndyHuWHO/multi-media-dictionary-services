@@ -2,6 +2,8 @@ package com.word.authservice.controller;
 
 import com.word.authservice.dto.*;
 import com.word.authservice.service.UserAccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Auth API")
 public class AuthController {
     private final UserAccountService userAccountService;
 
@@ -19,9 +22,11 @@ public class AuthController {
     }
 
     @GetMapping("")
+    @Operation(summary = "Welcome to MVP auth service api!")
     public String welcome() {return "Welcome to MVP auth service api!";}
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new user")
     public ResponseEntity<RegistrationResponseDTO> registerUser(
             @Valid @RequestBody RegistrationRequestDTO registrationRequestDTO) {
         System.out.println(registrationRequestDTO);
@@ -29,6 +34,7 @@ public class AuthController {
         return ResponseEntity.status(201).body(response);
     }
     @PostMapping("/login")
+    @Operation(summary = "Login a user")
     public ResponseEntity<LoginResponseDTO> loginUser(
             @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         System.out.println("hit auth service login endpoint");
@@ -38,6 +44,7 @@ public class AuthController {
 
     @PostMapping("/get-member")
     @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get membership")
     public ResponseEntity<LoginResponseDTO> getMembership(
             @RequestBody GetMembershipRequestDTO request,
             @AuthenticationPrincipal Jwt jwt
@@ -48,14 +55,17 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
+    @Operation(summary = "Verify login")
     public String test() {return "you are logged in";}
 
     @GetMapping("/user")
     @PreAuthorize("hasAuthority('ROLE_USER')")
+    @Operation(summary = "Verify login as a user")
     public String userAuthorized() {return "you are logged in as a user";}
 
 
     @GetMapping("/member")
     @PreAuthorize("hasAuthority('ROLE_MEMBER')")
+    @Operation(summary = "Verify login as a member")
     public String memberAuthorized() {return "you are logged in as a MEMBER";}
 }

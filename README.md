@@ -1,17 +1,66 @@
 # 📚 Multimedia Dictionary Application
-![Multimedia Dictionary Architecture](./assets/architecture.png)
+![Multimedia Dictionary Architecture](./assets/architecture1.2.jpg)
 
 A reactive Spring Boot microservices application consisting of:
 
 - **Word Service**: Manages dictionary entries with AI-powered definitions
 - **Auth Service**: Handles user authentication and authorization
 - **User Service**: Handles user profile management and user vocabulary notebook management
-- **Media Service**: Handles media uploading and steaming logic
-- **Media-Metadata Service**: Handles media meta-data management
+- **Media Service**: Handles media acquiring pre-signed upload url from S3 and saving media-metadata
+- **Media-After-Service**: Handles media format transformation, compression, etc.
 - **API GATEWAY**: Handles auth verification and traffic routing
 
 
 ---
+
+### 🐳 Docker Compose
+Make sure environment variables in the docker compose file are provided
+```bash
+docker compose up --build
+```
+
+
+## 🔐 Auth Endpoints (`/api/auth`)
+
+- `GET /` — Welcome message
+- `POST /register` — Register a new user
+- `POST /login` — Login and receive JWT
+- `POST /get-member` — Upgrade user to MEMBER (requires JWT)
+- `GET /profile` — Get current user's profile (requires JWT)
+- `GET /user` — Check access as USER role
+- `GET /member` — Check access as MEMBER role
+
+---
+
+## 📘 Dictionary Endpoints (`/api/words`)
+
+- `GET /` — Welcome message
+- `GET /{word}` — Get detailed dictionary entry for a word
+
+---
+
+## 👤 User Profile and Notes (`/api/user`)
+
+### Profile (`/profile`)
+- `GET` — Get user profile (header: `X-Auth-UserId`)
+- `POST` — Create profile
+- `PATCH` — Update profile
+
+### Notebooks (`/notebooks`)
+- `GET` — Get user notebooks
+- `POST` — Create a notebook
+- `PATCH /{notebookId}` — Update a notebook
+- `DELETE /{notebookId}` — Delete a notebook
+
+### Word Notes (`/notebooks/{notebookId}/notes`)
+- `GET` — Paginated notes (`pageable` query param)
+- `POST` — Add a new note
+- `PATCH /{noteId}` — Update note
+- `DELETE /{noteId}` — Delete note
+- `GET /all` — Get all notes in a notebook
+
+> ⚠️ All endpoints in User Profile & Notes require header: `X-Auth-UserId`
+
 
 ## 🧠 Word Service
 
