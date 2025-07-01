@@ -23,7 +23,7 @@ docker compose up --build
 
 ## 🔐 Auth Endpoints (`/api/auth`)
 
-### `POST /register` — Register a new user
+#### `POST /register` — Register a new user
 
 **Request Example:**
 ```json
@@ -46,7 +46,7 @@ docker compose up --build
 
 ---
 
-### `POST /login` — Login and receive JWT
+#### `POST /login` — Login and receive JWT
 
 **Request Example:**
 ```json
@@ -68,7 +68,7 @@ docker compose up --build
 
 ---
 
-### `POST /get-member` — Upgrade USER to MEMBER
+#### `POST /get-member` — Upgrade USER to MEMBER
 
 **Request Example:**
 ```json
@@ -89,7 +89,7 @@ docker compose up --build
 
 ---
 
-### `GET /profile` — Confirm user is authenticated
+#### `GET /profile` — Confirm user is authenticated
 
 **Response Example:**
 ```json
@@ -98,7 +98,7 @@ docker compose up --build
 
 ---
 
-### `GET /user` — Check access as a USER role
+#### `GET /user` — Check access as a USER role
 
 **Response Example:**
 ```json
@@ -107,7 +107,7 @@ docker compose up --build
 
 ---
 
-### `GET /member` — Check access as a MEMBER role
+#### `GET /member` — Check access as a MEMBER role
 
 **Response Example:**
 ```json
@@ -118,7 +118,7 @@ docker compose up --build
 
 ## 📘 Dictionary Endpoints (`/api/words`)
 
-### `GET /{word}` — Get detailed dictionary entry for a word
+#### `GET /{word}` — Get detailed dictionary entry for a word
 
 **Response Example:**
 ```json
@@ -147,7 +147,7 @@ docker compose up --build
 
 ---
 
-## 👤 User Profile and Notes (`/api/user`)
+## 👤 User Profile and Notes Endpoints (`/api/user`)
 
 ---
 ### Profile (`/profile`)
