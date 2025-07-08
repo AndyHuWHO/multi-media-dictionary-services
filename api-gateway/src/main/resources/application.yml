@@ -9,6 +9,8 @@ word:
   url: http://localhost:8083
 user:
   url: http://localhost:8082
+media:
+  url: http://localhost:8084
 
 spring:
   application:

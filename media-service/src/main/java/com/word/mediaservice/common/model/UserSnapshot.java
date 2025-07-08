@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UserSnapshot {
-    private String publicId;
+    private String authUserId;
     private String profileImageUrl;
     private String profileName;
 }

@@ -16,6 +16,8 @@ public class GatewayRoutesConfig {
     private String wordServiceUrl;
     @Value("${user.url}")
     private String userServiceUrl;
+    @Value("${media.url}")
+    private String mediaServiceUrl;
 
     public GatewayRoutesConfig(GatewayFilter loginResponseFilter) {
         this.loginResponseFilter = loginResponseFilter;
@@ -37,6 +39,9 @@ public class GatewayRoutesConfig {
                 .route("user-service", r -> r
                         .path("/api/user/**")
                         .uri(userServiceUrl))
+                .route("media-service", r -> r
+                        .path("/api/media/**")
+                        .uri(mediaServiceUrl))
                 .route("word-docs", r -> r
                         .path("/word/v3/api-docs")
                         .filters(f -> f.rewritePath("/word/(.*)", "/$1"))
