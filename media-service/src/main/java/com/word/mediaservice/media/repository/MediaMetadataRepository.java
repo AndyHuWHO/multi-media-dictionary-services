@@ -3,6 +3,7 @@ package com.word.mediaservice.media.repository;
 import com.word.mediaservice.media.model.MediaMetadata;
 import com.word.mediaservice.media.model.Visibility;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,23 @@ public interface MediaMetadataRepository extends ReactiveMongoRepository <MediaM
     Mono<MediaMetadata> findByObjectKey(String objectKey);
     // Find all media uploaded by a specific user
     Flux<MediaMetadata> findByAuthUserId(String authUserId);
+
+    Flux<MediaMetadata> findByAuthUserIdOrderByCreatedAtDesc(String authUserId, Pageable pageable);
+
+    Flux<MediaMetadata> findByAuthUserIdAndVisibilityOrderByCreatedAtDesc(
+            String authUserId,
+            Visibility visibility,
+            Pageable pageable
+    );
+
+    Flux<MediaMetadata> findByWordsContainingAndVisibilityOrderByCreatedAtDesc(
+            String word,
+            Visibility visibility,
+            Pageable pageable
+    );
+
+    Flux<MediaMetadata> findByVisibility(Visibility visibility, Pageable pageable);
+
 
     // Find all public media
     Flux<MediaMetadata> findByVisibility(Visibility visibility);

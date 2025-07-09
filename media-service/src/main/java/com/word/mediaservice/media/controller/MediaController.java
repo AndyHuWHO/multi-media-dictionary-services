@@ -3,11 +3,12 @@ package com.word.mediaservice.media.controller;
 import com.word.mediaservice.media.dto.GenerateUploadUrlResponseDTO;
 import com.word.mediaservice.media.dto.MediaMetadataRequestDTO;
 import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
-import com.word.mediaservice.media.dto.MediaMetadataSaveResponseDTO;
+import com.word.mediaservice.media.dto.MediaMetadataUpdateRequestDTO;
 import com.word.mediaservice.media.service.MediaUploadService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -37,11 +38,62 @@ public class MediaController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<MediaMetadataSaveResponseDTO>> saveMediaMetadata(
+    public Mono<ResponseEntity<MediaMetadataResponseDTO>> saveMediaMetadata(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @Valid @RequestBody MediaMetadataRequestDTO requestDTO
     ) {
         return mediaUploadService.saveMediaMetadata(authUserId, requestDTO)
                 .map(ResponseEntity::ok);
     }
+
+    @GetMapping("/user")
+    public Flux<MediaMetadataResponseDTO> getUserMedia(
+            @RequestHeader("X-Auth-UserId") String authUserId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return mediaUploadService.getUserMedia(authUserId, page, size);
+    }
+
+    @GetMapping("/user/{userId}")
+    public Flux<MediaMetadataResponseDTO> getPublicMediaByUser(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return mediaUploadService.getPublicMediaByUser(userId, page, size);
+    }
+
+    @GetMapping("/word/{word}")
+    public Flux<MediaMetadataResponseDTO> getPublicMediaByWord(
+            @PathVariable String word,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return mediaUploadService.getPublicMediaByWord(word, page, size);
+    }
+
+    @GetMapping("/feed")
+    public Flux<MediaMetadataResponseDTO> getFeed(
+            @RequestParam(defaultValue = "0") int page) {
+        return mediaUploadService.getFeed(page);
+    }
+
+    @PatchMapping("/{mediaId}")
+    public Mono<ResponseEntity<MediaMetadataResponseDTO>> updateMediaMetadata(
+            @RequestHeader("X-Auth-UserId") String authUserId,
+            @PathVariable String mediaId,
+            @Valid @RequestBody MediaMetadataUpdateRequestDTO dto) {
+        return mediaUploadService.updateMediaMetadata(authUserId, mediaId, dto)
+                .map(ResponseEntity::ok);
+    }
+
+    @DeleteMapping("/{mediaId}")
+    public Mono<ResponseEntity<Void>> deleteMedia(
+            @RequestHeader("X-Auth-UserId") String authUserId,
+            @PathVariable String mediaId) {
+        return mediaUploadService.deleteMedia(authUserId, mediaId)
+                .thenReturn(ResponseEntity.noContent().build());
+    }
+
+
 }

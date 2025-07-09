@@ -3,11 +3,14 @@ package com.word.mediaservice.common.exception;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.springframework.core.codec.DecodingException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerErrorException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -24,10 +27,12 @@ public class GlobalExceptionHandler {
                         (existing, replacement) -> existing
                 ));
 
-        return Mono.just(ResponseEntity.badRequest().body(errors));
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errors));
     }
 
-    // NEW: Handle enum parse / JSON type mismatches
+    // Handle enum parse / JSON type mismatches
     @ExceptionHandler(DecodingException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleDecodingException(DecodingException ex) {
         Throwable cause = ex.getCause();
@@ -38,14 +43,29 @@ public class GlobalExceptionHandler {
             message = mismatchEx.getOriginalMessage(); // more descriptive message
         }
         return Mono.just(ResponseEntity
-                .badRequest()
+                .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", message)));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return Mono.just(ResponseEntity
-                .badRequest()
+                .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", ex.getMessage())));
+    }
+    // Handles invalid query/path params (e.g., wrong type for `page`)
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleServerWebInput(ServerWebInputException ex) {
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "Invalid query or path parameter: " + ex.getReason())));
+    }
+
+    //Generic internal WebFlux/server exceptions
+    @ExceptionHandler(ServerErrorException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleServerError(ServerErrorException ex) {
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Server error: " + ex.getMessage())));
     }
 }
