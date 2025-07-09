@@ -10,9 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/media")
+@Tag(name = "Media", description = "Media API")
 public class MediaController {
     private final MediaUploadService mediaUploadService;
 
@@ -21,6 +24,7 @@ public class MediaController {
     }
 
     @PostMapping("/validate")
+    @Operation(summary = "Validate metadata before uploading")
     public Mono<ResponseEntity<Void>> validateMetadata(
             @Valid @RequestBody MediaMetadataRequestDTO requestDTO
     ) {
@@ -30,6 +34,7 @@ public class MediaController {
     }
 
     @PostMapping("/upload-url")
+    @Operation(summary = "Generate upload URLs for media files")
     public Mono<ResponseEntity<GenerateUploadUrlResponseDTO>> generateUploadUrls(
             @RequestHeader("X-Auth-UserId") String userId
     ) {
@@ -38,6 +43,7 @@ public class MediaController {
     }
 
     @PostMapping
+    @Operation(summary = "Upload media-metadata")
     public Mono<ResponseEntity<MediaMetadataResponseDTO>> saveMediaMetadata(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @Valid @RequestBody MediaMetadataRequestDTO requestDTO
@@ -47,6 +53,7 @@ public class MediaController {
     }
 
     @GetMapping("/user")
+    @Operation(summary = "Get the current user's media")
     public Flux<MediaMetadataResponseDTO> getUserMedia(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @RequestParam(defaultValue = "0") int page,
@@ -55,6 +62,7 @@ public class MediaController {
     }
 
     @GetMapping("/user/{userId}")
+    @Operation(summary = "Get a specified user's public media")
     public Flux<MediaMetadataResponseDTO> getPublicMediaByUser(
             @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
@@ -64,6 +72,7 @@ public class MediaController {
     }
 
     @GetMapping("/word/{word}")
+    @Operation(summary = "Get media by word")
     public Flux<MediaMetadataResponseDTO> getPublicMediaByWord(
             @PathVariable String word,
             @RequestParam(defaultValue = "0") int page,
@@ -73,12 +82,14 @@ public class MediaController {
     }
 
     @GetMapping("/feed")
+    @Operation(summary = "Get the latest and most interacted media feed")
     public Flux<MediaMetadataResponseDTO> getFeed(
             @RequestParam(defaultValue = "0") int page) {
         return mediaUploadService.getFeed(page);
     }
 
     @PatchMapping("/{mediaId}")
+    @Operation(summary = "Update media metadata")
     public Mono<ResponseEntity<MediaMetadataResponseDTO>> updateMediaMetadata(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @PathVariable String mediaId,
@@ -88,12 +99,11 @@ public class MediaController {
     }
 
     @DeleteMapping("/{mediaId}")
+    @Operation(summary = "Delete media")
     public Mono<ResponseEntity<Void>> deleteMedia(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @PathVariable String mediaId) {
         return mediaUploadService.deleteMedia(authUserId, mediaId)
                 .thenReturn(ResponseEntity.noContent().build());
     }
-
-
 }

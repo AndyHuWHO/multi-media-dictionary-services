@@ -201,7 +201,14 @@ docker compose up --build
   "dateUpdated": "2025-07-01T12:05:00Z"
 }
 ```
-
+#### `POST/profile-image/upload-url` — Get pre-signed upload URL for profile image
+**Response Example:**
+```json
+{
+"uploadUrl": "https://example.com/upload/url",
+"publicUrl": "https://example.com/public/url/image.png"
+}
+```
 ---
 ### Notebooks (`/notebooks`) 
 (needs MEMBER ROLE)
@@ -372,6 +379,194 @@ GET /api/user/notebooks/1/notes?pageable.page=0&pageable.size=10
 ]
 ```
 
+
+---
+
+
+## 🎞️ Media Endpoints (`/api/media`)
+
+### `POST /api/media/validate` — Validate metadata before uploading
+
+**Request Example:**
+```json
+{
+  "objectKey": "video123.mp4",
+  "thumbnailKey": "thumb123.jpg",
+  "description": "An explanation of 'ephemeral'",
+  "words": ["ephemeral"],
+  "tags": ["vocab"],
+  "durationSeconds": 28.5,
+  "fileSizeBytes": 10500000,
+  "visibility": "PUBLIC"
+}
+```
+
+**Response:** `200 OK`
+
+---
+
+### `POST /api/media/upload-url` — Generate upload URLs for media files
+
+**Headers:**
+- `X-Auth-UserId: user-123`
+
+**Response Example:**
+```json
+{
+  "uploadUrl": "https://example.com/upload/video",
+  "objectKey": "video123.mp4",
+  "thumbnailUploadUrl": "https://example.com/upload/thumb",
+  "thumbnailKey": "thumb123.jpg"
+}
+```
+
+---
+
+### `POST /api/media` — Upload media metadata
+
+**Headers:**
+- `X-Auth-UserId: user-123`
+
+**Request Example:**
+```json
+{
+  "objectKey": "video123.mp4",
+  "thumbnailKey": "thumb123.jpg",
+  "description": "An explanation of 'ephemeral'",
+  "words": ["ephemeral"],
+  "tags": ["vocab"],
+  "durationSeconds": 28.5,
+  "fileSizeBytes": 10500000,
+  "visibility": "PUBLIC"
+}
+```
+
+**Response Example:**
+```json
+{
+  "id": "media-1",
+  "authUserId": "user-123",
+  "objectPresignedGetUrl": "https://example.com/get/video",
+  "thumbnailPresignedGetUrl": "https://example.com/get/thumb",
+  "description": "An explanation of 'ephemeral'",
+  "words": ["ephemeral"],
+  "tags": ["vocab"],
+  "likeCount": 0,
+  "commentCount": 0,
+  "durationSeconds": 28.5,
+  "fileSizeBytes": 10500000,
+  "visibility": "PUBLIC",
+  "createdAt": "2025-07-01T12:00:00Z",
+  "updatedAt": "2025-07-01T12:00:00Z"
+}
+```
+
+---
+
+### `PATCH /api/media/{mediaId}` — Update media metadata
+
+**Headers:**
+- `X-Auth-UserId: user-123`
+
+**Request Example:**
+```json
+{
+  "description": "New description",
+  "tags": ["education"],
+  "words": ["ephemeral", "fleeting"],
+  "visibility": "PRIVATE"
+}
+```
+
+**Response Example:**
+```json
+{
+  "id": "media-1",
+  "authUserId": "user-123",
+  "objectPresignedGetUrl": "https://example.com/get/video",
+  "thumbnailPresignedGetUrl": "https://example.com/get/thumb",
+  "description": "New description",
+  "words": ["ephemeral", "fleeting"],
+  "tags": ["education"],
+  "likeCount": 0,
+  "commentCount": 0,
+  "durationSeconds": 28.5,
+  "fileSizeBytes": 10500000,
+  "visibility": "PRIVATE",
+  "createdAt": "2025-07-01T12:00:00Z",
+  "updatedAt": "2025-07-01T12:30:00Z"
+}
+```
+
+---
+
+### `DELETE /api/media/{mediaId}` — Delete media
+
+**Headers:**
+- `X-Auth-UserId: user-123`
+
+**Response:**
+```json
+"Media deleted successfully"
+```
+
+---
+
+### `GET /api/media/user` — Get current user's media
+
+**Headers:**
+- `X-Auth-UserId: user-123`
+
+**Query Params:**
+- `page`: 0 (default)
+- `size`: 10 (default)
+
+**Response Example:**
+```json
+[
+  {
+    "id": "media-1",
+    "authUserId": "user-123",
+    "objectPresignedGetUrl": "https://example.com/get/video",
+    "thumbnailPresignedGetUrl": "https://example.com/get/thumb",
+    "description": "An explanation of 'ephemeral'",
+    "words": ["ephemeral"],
+    "tags": ["vocab"],
+    "likeCount": 10,
+    "commentCount": 2,
+    "durationSeconds": 28.5,
+    "fileSizeBytes": 10500000,
+    "visibility": "PUBLIC",
+    "createdAt": "2025-07-01T12:00:00Z",
+    "updatedAt": "2025-07-01T12:00:00Z"
+  }
+]
+```
+
+---
+
+### `GET /api/media/user/{userId}` — Get a specified user's public media
+
+**Query Params:** Same as above
+
+**Response:** Same structure as `/api/media/user`
+
+---
+
+### `GET /api/media/word/{word}` — Get public media by word
+
+**Query Params:** Same as above
+
+**Response:** Same structure as `/api/media/user`
+
+---
+
+### `GET /api/media/feed` — Get latest and most interacted public media
+
+**Query Params:**
+- `page`: 0 (default)
+
+**Response:** Same structure as `/api/media/user`
 
 ---
 
