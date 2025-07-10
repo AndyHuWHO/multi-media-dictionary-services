@@ -1,11 +1,14 @@
 package com.word.mediaservice.engagement.service;
 
+import com.word.mediaservice.engagement.exception.DuplicateLikeException;
+import com.word.mediaservice.engagement.exception.LikeNotFoundException;
 import com.word.mediaservice.engagement.model.MediaLike;
 import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
 import com.word.mediaservice.engagement.repository.MediaLikeRepository;
 import com.word.mediaservice.media.model.MediaMetadata;
 import com.word.mediaservice.media.repository.MediaMetadataRepository;
 import com.word.mediaservice.media.util.MediaMetadataMapper;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -46,13 +49,22 @@ public class MediaLikeServiceImpl implements MediaLikeService{
 
         return mediaLikeRepository
                 .save(like)
-                .then(incrementLikeCount(mediaId, 1));
+                .then(incrementLikeCount(mediaId, 1))
+                .onErrorResume(DuplicateKeyException.class, ex ->
+                        Mono.error(new DuplicateLikeException("User has already liked this media."))
+                );
     }
 
     @Override
     public Mono<Void> unlikeMedia(String authUserId, String mediaId) {
-        return mediaLikeRepository.deleteByAuthUserIdAndMediaId(authUserId, mediaId)
-                .then(incrementLikeCount(mediaId, -1));
+        Query query = Query.query(Criteria.where("authUserId").is(authUserId).and("mediaId").is(mediaId));
+        return mongoTemplate.remove(query, MediaLike.class)
+                .flatMap(result -> {
+                    if (result.getDeletedCount() == 0) {
+                        return Mono.error(new LikeNotFoundException("Like does not exist."));
+                    }
+                    return incrementLikeCount(mediaId, -1);
+                });
     }
 
     @Override

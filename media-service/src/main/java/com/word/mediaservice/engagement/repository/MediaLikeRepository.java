@@ -1,5 +1,6 @@
 package com.word.mediaservice.engagement.repository;
 
+import com.mongodb.client.result.DeleteResult;
 import com.word.mediaservice.engagement.model.MediaLike;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;

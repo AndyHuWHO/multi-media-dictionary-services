@@ -2,6 +2,9 @@ package com.word.mediaservice.common.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.word.mediaservice.engagement.exception.DuplicateLikeException;
+import com.word.mediaservice.engagement.exception.LikeNotFoundException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,5 +70,24 @@ public class GlobalExceptionHandler {
         return Mono.just(ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Server error: " + ex.getMessage())));
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleDuplicateKey(DuplicateKeyException ex) {
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(Map.of("message", ex.getMessage())));
+    }
+
+    @ExceptionHandler(DuplicateLikeException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleDuplicateLike(DuplicateLikeException ex) {
+        return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage())));
+    }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleLikeNotFound(LikeNotFoundException ex) {
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", ex.getMessage())));
     }
 }
