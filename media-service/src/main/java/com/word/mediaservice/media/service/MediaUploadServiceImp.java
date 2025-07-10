@@ -7,6 +7,7 @@ import com.word.mediaservice.media.dto.MediaMetadataUpdateRequestDTO;
 import com.word.mediaservice.media.model.MediaMetadata;
 import com.word.mediaservice.media.model.Visibility;
 import com.word.mediaservice.media.repository.MediaMetadataRepository;
+import com.word.mediaservice.media.util.MediaMetadataMapper;
 import com.word.mediaservice.media.util.S3Util;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,12 @@ import reactor.core.publisher.Mono;
 public class MediaUploadServiceImp implements MediaUploadService{
     private final S3Util s3Util;
     private final MediaMetadataRepository mediaMetadataRepository;
+    private final MediaMetadataMapper mediaMetadataMapper;
 
-    public MediaUploadServiceImp(S3Util s3Util, MediaMetadataRepository mediaMetadataRepository) {
+    public MediaUploadServiceImp(S3Util s3Util, MediaMetadataRepository mediaMetadataRepository, MediaMetadataMapper mediaMetadataMapper) {
         this.s3Util = s3Util;
         this.mediaMetadataRepository = mediaMetadataRepository;
+        this.mediaMetadataMapper = mediaMetadataMapper;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
                 .commentCount(0)
                 .build();
         return mediaMetadataRepository.save(metadata)
-                .map(this::toResponseDTO);
+                .map(mediaMetadataMapper::toResponseDTO);
     }
 
 
@@ -75,7 +78,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
     public Flux<MediaMetadataResponseDTO> getUserMedia(String authUserId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return mediaMetadataRepository.findByAuthUserIdOrderByCreatedAtDesc(authUserId, pageable)
-                .map(this::toResponseDTO);
+                .map(mediaMetadataMapper::toResponseDTO);
     }
 
     @Override
@@ -83,7 +86,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return mediaMetadataRepository
                 .findByAuthUserIdAndVisibilityOrderByCreatedAtDesc(userId, Visibility.PUBLIC, pageable)
-                .map(this::toResponseDTO);
+                .map(mediaMetadataMapper::toResponseDTO);
     }
 
     @Override
@@ -91,7 +94,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return mediaMetadataRepository
                 .findByWordsContainingAndVisibilityOrderByCreatedAtDesc(word, Visibility.PUBLIC, pageable)
-                .map(this::toResponseDTO);
+                .map(mediaMetadataMapper::toResponseDTO);
     }
 
     @Override
@@ -110,7 +113,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
 
         return Flux.merge(recent, liked, commented)
                 .distinct(MediaMetadata::getId)  // deduplication
-                .map(this::toResponseDTO);       // add presigned GET URLs
+                .map(mediaMetadataMapper::toResponseDTO);       // add presigned GET URLs
     }
 
     @Override
@@ -138,7 +141,7 @@ public class MediaUploadServiceImp implements MediaUploadService{
                     }
 
                     return mediaMetadataRepository.save(media)
-                            .map(this::toResponseDTO);
+                            .map(mediaMetadataMapper::toResponseDTO);
                 });
     }
 
@@ -161,25 +164,4 @@ public class MediaUploadServiceImp implements MediaUploadService{
                 });
     }
 
-
-
-
-    private MediaMetadataResponseDTO toResponseDTO(MediaMetadata media) {
-        return MediaMetadataResponseDTO.builder()
-                .id(media.getId())
-                .authUserId(media.getAuthUserId())
-                .objectPresignedGetUrl(s3Util.generatePresignedGetUrl(media.getObjectKey()))
-                .thumbnailPresignedGetUrl(s3Util.generatePresignedGetUrl(media.getThumbnailKey()))
-                .createdAt(media.getCreatedAt())
-                .updatedAt(media.getUpdatedAt())
-                .description(media.getDescription())
-                .words(media.getWords())
-                .tags(media.getTags())
-                .likeCount(media.getLikeCount())
-                .commentCount(media.getCommentCount())
-                .durationSeconds(media.getDurationSeconds())
-                .fileSizeBytes(media.getFileSizeBytes())
-                .visibility(media.getVisibility())
-                .build();
-    }
 }

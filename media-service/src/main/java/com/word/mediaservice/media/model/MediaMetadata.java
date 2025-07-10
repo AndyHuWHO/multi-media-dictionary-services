@@ -1,6 +1,5 @@
 package com.word.mediaservice.media.model;
 
-import com.word.mediaservice.common.model.UserSnapshot;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -43,12 +43,16 @@ public class GatewayRoutesConfig {
                         .path("/api/media/**")
                         .uri(mediaServiceUrl))
                 .route("word-docs", r -> r
-                        .path("/word/v3/api-docs")
-                        .filters(f -> f.rewritePath("/word/(.*)", "/$1"))
+                        .path("/words/v3/api-docs")
+                        .filters(f -> f.rewritePath("/words/(.*)", "/$1"))
                         .uri(userServiceUrl))
                 .route("user-docs", r -> r
                         .path("/user/v3/api-docs")
                         .filters(f -> f.rewritePath("/user/(.*)", "/$1"))
+                        .uri(userServiceUrl))
+                .route("media-docs", r -> r
+                        .path("/media/v3/api-docs")
+                        .filters(f -> f.rewritePath("/media/(.*)", "/$1"))
                         .uri(userServiceUrl))
                 .build();
     }

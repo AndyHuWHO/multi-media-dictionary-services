@@ -1,6 +1,5 @@
 package com.word.mediaservice.media.dto;
 
-import com.word.mediaservice.common.model.UserSnapshot;
 import com.word.mediaservice.media.model.Visibility;
 import lombok.Builder;
 import lombok.Data;
