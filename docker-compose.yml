@@ -31,7 +31,7 @@ services:
     networks:
       - backend
 
-  # MongoDB for Word Service
+  # MongoDB for Word and Media Service
   mongodb:
     image: mongo:8
     container_name: mongodb
@@ -67,6 +67,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_service_db
       SPRING_DATASOURCE_USERNAME: user_user
       SPRING_DATASOURCE_PASSWORD: user_pass
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_USER_BUCKET_NAME}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     depends_on:
       - postgres-user
     networks:
@@ -85,6 +89,24 @@ services:
     networks:
       - backend
 
+  # Media Service
+  media-service:
+    build:
+      context: ./media-service
+    container_name: media-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/media_service_db
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_MEDIA_BUCKET_NAME}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      - mongodb
+    ports:
+      - "8084:8080"
+    networks:
+      - backend
+
   # API Gateway
   api-gateway:
     build:
@@ -97,10 +119,12 @@ services:
       auth.url: http://auth-service:8081
       user.url: http://user-service:8082
       word.url: http://word-service:8083
+      media.url: http://media-service:8084
     depends_on:
       - auth-service
       - user-service
       - word-service
+      - media-service
     networks:
       - backend
 
