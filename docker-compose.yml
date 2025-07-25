@@ -1,46 +1,46 @@
 version: '3.8'
 
 services:
-  # PostgreSQL for Auth Service
-  postgres-auth:
-    image: postgres:15
-    container_name: postgres-auth
-    environment:
-      POSTGRES_DB: auth_service_db
-      POSTGRES_USER: auth_user
-      POSTGRES_PASSWORD: auth_pass
-    ports:
-      - "5434:5432"
-    volumes:
-      - postgres-auth-data:/var/lib/postgresql/data
-    networks:
-      - backend
+#  # PostgreSQL for Auth Service
+#  postgres-auth:
+#    image: postgres:15
+#    container_name: postgres-auth
+#    environment:
+#      POSTGRES_DB: auth_service_db
+#      POSTGRES_USER: auth_user
+#      POSTGRES_PASSWORD: auth_pass
+#    ports:
+#      - "5434:5432"
+#    volumes:
+#      - postgres-auth-data:/var/lib/postgresql/data
+#    networks:
+#      - backend
 
-  # PostgreSQL for User Service
-  postgres-user:
-    image: postgres:15
-    container_name: postgres-user
-    environment:
-      POSTGRES_DB: user_service_db
-      POSTGRES_USER: user_user
-      POSTGRES_PASSWORD: user_pass
-    ports:
-      - "5435:5432"
-    volumes:
-      - postgres-user-data:/var/lib/postgresql/data
-    networks:
-      - backend
+#  # PostgreSQL for User Service
+#  postgres-user:
+#    image: postgres:15
+#    container_name: postgres-user
+#    environment:
+#      POSTGRES_DB: user_service_db
+#      POSTGRES_USER: user_user
+#      POSTGRES_PASSWORD: user_pass
+#    ports:
+#      - "5435:5432"
+#    volumes:
+#      - postgres-user-data:/var/lib/postgresql/data
+#    networks:
+#      - backend
 
-  # MongoDB for Word and Media Service
-  mongodb:
-    image: mongo:8
-    container_name: mongodb
-    ports:
-      - "27018:27017"
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - backend
+#  # MongoDB for Word and Media Service
+#  mongodb:
+#    image: mongo:8
+#    container_name: mongodb
+#    ports:
+#      - "27018:27017"
+#    volumes:
+#      - mongodb_data:/data/db
+#    networks:
+#      - backend
 
   # Auth Service
   auth-service:
@@ -48,13 +48,16 @@ services:
       context: ./auth-service
     container_name: auth-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_service_db
-      SPRING_DATASOURCE_USERNAME: auth_user
-      SPRING_DATASOURCE_PASSWORD: auth_pass
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_service_db
+#      SPRING_DATASOURCE_USERNAME: auth_user
+#      SPRING_DATASOURCE_PASSWORD: auth_pass
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       USER_SERVICE_URL: http://user-service:8082
-    depends_on:
-      - postgres-auth
+#    depends_on:
+#      - postgres-auth
     networks:
       - backend
 
@@ -64,15 +67,18 @@ services:
       context: ./user-service
     container_name: user-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_service_db
-      SPRING_DATASOURCE_USERNAME: user_user
-      SPRING_DATASOURCE_PASSWORD: user_pass
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/user_service_db
+#      SPRING_DATASOURCE_USERNAME: user_user
+#      SPRING_DATASOURCE_PASSWORD: user_pass
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       AWS_REGION: ${AWS_REGION}
       AWS_S3_BUCKET_NAME: ${AWS_S3_USER_BUCKET_NAME}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-    depends_on:
-      - postgres-user
+#    depends_on:
+#      - postgres-user
     networks:
       - backend
 
@@ -82,10 +88,11 @@ services:
       context: ./word-service
     container_name: word-service
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/wordservice
+#      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/wordservice
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_WS_URI}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-    depends_on:
-      - mongodb
+#    depends_on:
+#      - mongodb
     networks:
       - backend
 
@@ -95,13 +102,14 @@ services:
       context: ./media-service
     container_name: media-service
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/media_service_db
+#      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/media_service_db
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_MS_URI}
       AWS_REGION: ${AWS_REGION}
       AWS_S3_BUCKET_NAME: ${AWS_S3_MEDIA_BUCKET_NAME}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-    depends_on:
-      - mongodb
+#    depends_on:
+#      - mongodb
     ports:
       - "8084:8080"
     networks:
@@ -128,10 +136,10 @@ services:
     networks:
       - backend
 
-volumes:
-  postgres-auth-data:
-  postgres-user-data:
-  mongodb_data:
+#volumes:
+#  postgres-auth-data:
+#  postgres-user-data:
+#  mongodb_data:
 networks:
   backend:
     driver: bridge

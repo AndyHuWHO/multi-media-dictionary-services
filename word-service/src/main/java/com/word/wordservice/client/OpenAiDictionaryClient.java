@@ -70,7 +70,7 @@ public class OpenAiDictionaryClient {
                         Respond with JSON only. No comments, no Markdown, no extra text.
                         Important: make sure you provide comprehensive list of dictionaryInfo word senses
                         and sampleExpressions and sentences. When it's a list field, provide multiple if applicable
-                        in the sense of an official dictionary, rather than providing just one.
+                        exactly like an official dictionary, rather than providing just one.
                         Your response should strictly follow the name and structure in the json example given
                         in prompt so the service could parse into java object.
                         """, word
