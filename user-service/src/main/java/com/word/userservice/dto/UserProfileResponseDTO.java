@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 public class UserProfileResponseDTO {
     private String profileName;
+    private String publicId;
     private String bio;
     private String profileImageUrl;
     private Gender gender;

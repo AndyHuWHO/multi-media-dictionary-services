@@ -7,7 +7,6 @@ import com.word.userservice.model.UserProfile;
 import com.word.userservice.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 
 @Service
 public class UserProfileServiceImpl implements UserProfileService{
@@ -43,6 +42,7 @@ public class UserProfileServiceImpl implements UserProfileService{
     private UserProfileResponseDTO mapToResponseDto(UserProfile profile) {
         return UserProfileResponseDTO.builder()
                 .profileName(profile.getProfileName())
+                .publicId(profile.getAuthUserId())
                 .bio(profile.getBio())
                 .profileImageUrl(profile.getProfileImageUrl())
                 .gender(profile.getGender())
