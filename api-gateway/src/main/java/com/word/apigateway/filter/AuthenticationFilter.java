@@ -28,6 +28,8 @@ public class AuthenticationFilter  implements GlobalFilter, Ordered {
         // Skip auth-service and word-service
         if (path.startsWith("/api/auth/") ||
                 path.startsWith("/api/words/") ||
+                path.startsWith("/api/media/word/") ||
+                path.startsWith("/api/media/feed/") ||
                 path.startsWith("/words/v3/api-docs") ||
                 path.startsWith("/user/v3/api-docs") ||
                 path.startsWith("/media/v3/api-docs")) {
