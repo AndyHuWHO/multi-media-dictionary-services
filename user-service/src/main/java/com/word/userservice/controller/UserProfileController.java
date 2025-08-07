@@ -3,6 +3,7 @@ package com.word.userservice.controller;
 import com.word.userservice.dto.PreSingedUrlResponseDTO;
 import com.word.userservice.dto.UserProfileRequestDTO;
 import com.word.userservice.dto.UserProfileResponseDTO;
+import com.word.userservice.dto.VisitUserProfileResponseDTO;
 import com.word.userservice.service.S3Service;
 import com.word.userservice.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,12 @@ public class UserProfileController {
             @RequestHeader("X-Auth-UserId") String authUserId) {
         return ResponseEntity.ok(userProfileService.getProfileByAuthUserId(authUserId));
     }
+
+    @GetMapping("/visit/{authUserId}")
+    @Operation()
+    public ResponseEntity<VisitUserProfileResponseDTO> visitUserProfile(
+            @PathVariable String authUserId
+    ) { return ResponseEntity.ok(userProfileService.visitUserProfile(authUserId));}
 
     @PatchMapping
     @Operation(summary = "Update user profile")

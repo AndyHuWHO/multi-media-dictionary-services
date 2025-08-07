@@ -2,6 +2,7 @@ package com.word.userservice.service;
 
 import com.word.userservice.dto.UserProfileRequestDTO;
 import com.word.userservice.dto.UserProfileResponseDTO;
+import com.word.userservice.dto.VisitUserProfileResponseDTO;
 import com.word.userservice.exception.UserProfileNotFoundException;
 import com.word.userservice.model.UserProfile;
 import com.word.userservice.repository.UserProfileRepository;
@@ -63,6 +64,20 @@ public class UserProfileServiceImpl implements UserProfileService{
                 .build();
 
         return mapToResponseDto(userProfileRepository.save(profile));
+    }
+
+    @Override
+    public VisitUserProfileResponseDTO visitUserProfile(String authUserId) {
+        UserProfile profile = userProfileRepository.findByAuthUserId(authUserId)
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found"));
+
+        return VisitUserProfileResponseDTO.builder()
+                .profileName(profile.getProfileName())
+                .authUserId(profile.getAuthUserId())
+                .bio(profile.getBio())
+                .profileImageUrl(profile.getProfileImageUrl())
+                .gender(profile.getGender())
+                .build();
     }
 
 }
