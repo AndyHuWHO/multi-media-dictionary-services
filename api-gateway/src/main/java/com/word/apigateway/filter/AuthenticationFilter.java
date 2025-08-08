@@ -29,7 +29,7 @@ public class AuthenticationFilter  implements GlobalFilter, Ordered {
         if (path.startsWith("/api/auth/") ||
                 path.startsWith("/api/words/") ||
                 path.startsWith("/api/media/word/") ||
-                path.startsWith("/api/media/feed/") ||
+                path.startsWith("/api/media/feed") ||
                 path.startsWith("/api/user/profile/visit") ||
                 path.startsWith("/words/v3/api-docs") ||
                 path.startsWith("/user/v3/api-docs") ||
