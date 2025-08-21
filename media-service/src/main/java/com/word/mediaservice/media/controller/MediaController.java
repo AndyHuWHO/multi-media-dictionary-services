@@ -1,5 +1,6 @@
 package com.word.mediaservice.media.controller;
 
+import com.word.mediaservice.common.dto.PageResponseDTO;
 import com.word.mediaservice.media.dto.GenerateUploadUrlResponseDTO;
 import com.word.mediaservice.media.dto.MediaMetadataRequestDTO;
 import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
@@ -71,22 +72,47 @@ public class MediaController {
         return mediaUploadService.getPublicMediaByUser(userId, page, size);
     }
 
+//    @GetMapping("/word/{word}")
+//    @Operation(summary = "Get media by word")
+//    public Flux<MediaMetadataResponseDTO> getPublicMediaByWord(
+//            @PathVariable String word,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        return mediaUploadService.getPublicMediaByWord(word, page, size);
+//    }
+//
+//    @GetMapping("/feed")
+//    @Operation(summary = "Get the latest and most interacted media feed")
+//    public Flux<MediaMetadataResponseDTO> getFeed(
+//            @RequestParam(defaultValue = "0") int page) {
+//        return mediaUploadService.getFeed(page);
+//    }
+
+    // ...imports and annotations remain unchanged
+
     @GetMapping("/word/{word}")
-    @Operation(summary = "Get media by word")
-    public Flux<MediaMetadataResponseDTO> getPublicMediaByWord(
+    @Operation(summary = "Get media by word (paged)")
+    public Mono<ResponseEntity<PageResponseDTO<MediaMetadataResponseDTO>>> getPublicMediaByWordPaged(
             @PathVariable String word,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return mediaUploadService.getPublicMediaByWord(word, page, size);
+        return mediaUploadService.getPublicMediaByWordPaged(word, page, size)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/feed")
-    @Operation(summary = "Get the latest and most interacted media feed")
-    public Flux<MediaMetadataResponseDTO> getFeed(
-            @RequestParam(defaultValue = "0") int page) {
-        return mediaUploadService.getFeed(page);
+    @Operation(summary = "Get the latest and most interacted media feed (paged)")
+    public Mono<ResponseEntity<PageResponseDTO<MediaMetadataResponseDTO>>> getFeedPaged(
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        return mediaUploadService.getFeedPaged(page)
+                .map(ResponseEntity::ok);
     }
+
+
+
 
     @PatchMapping("/{mediaId}")
     @Operation(summary = "Update media metadata")

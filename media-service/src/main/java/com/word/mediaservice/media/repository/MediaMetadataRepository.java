@@ -28,6 +28,12 @@ public interface MediaMetadataRepository extends ReactiveMongoRepository <MediaM
     );
 
     Flux<MediaMetadata> findByVisibility(Visibility visibility, Pageable pageable);
+    
+    Mono<Long> countByVisibility(Visibility visibility);
+    Mono<Long> countByWordsContainingAndVisibility(String word, Visibility visibility);
+    Mono<Long> countByAuthUserIdAndVisibility(String authUserId, Visibility visibility);
+    Mono<Long> countByAuthUserId(String authUserId);
+
 
 
     // Find all public media
