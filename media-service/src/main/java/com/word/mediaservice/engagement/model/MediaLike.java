@@ -15,7 +15,7 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@CompoundIndex(name = "user_media_idx", def = "{'userId': 1, 'mediaId': 1}", unique = true)
+@CompoundIndex(name = "user_media_idx", def = "{'authUserId': 1, 'mediaId': 1}", unique = true)
 @CompoundIndex(name = "media_idx", def = "{'mediaId': 1}")
 @CompoundIndex(name = "authUser_idx", def = "{'authUserId': 1}")
 public class MediaLike {
