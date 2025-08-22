@@ -1,6 +1,7 @@
 package com.word.mediaservice.media.service;
 
 import com.word.mediaservice.common.dto.PageResponseDTO;
+import com.word.mediaservice.engagement.repository.MediaLikeRepository;
 import com.word.mediaservice.media.dto.GenerateUploadUrlResponseDTO;
 import com.word.mediaservice.media.dto.MediaMetadataRequestDTO;
 import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
@@ -26,11 +27,13 @@ public class MediaUploadServiceImp implements MediaUploadService {
     private final S3Util s3Util;
     private final MediaMetadataRepository mediaMetadataRepository;
     private final MediaMetadataMapper mediaMetadataMapper;
+    private final MediaLikeRepository mediaLikeRepository;
 
-    public MediaUploadServiceImp(S3Util s3Util, MediaMetadataRepository mediaMetadataRepository, MediaMetadataMapper mediaMetadataMapper) {
+    public MediaUploadServiceImp(S3Util s3Util, MediaMetadataRepository mediaMetadataRepository, MediaMetadataMapper mediaMetadataMapper, MediaLikeRepository mediaLikeRepository) {
         this.s3Util = s3Util;
         this.mediaMetadataRepository = mediaMetadataRepository;
         this.mediaMetadataMapper = mediaMetadataMapper;
+        this.mediaLikeRepository = mediaLikeRepository;
     }
 
     @Override
@@ -235,9 +238,18 @@ public class MediaUploadServiceImp implements MediaUploadService {
                     String videoKey = media.getObjectKey();
                     String thumbnailKey = media.getThumbnailKey();
 
-                    return s3Util.s3AsyncDelete(videoKey)
-                            .then(s3Util.s3AsyncDelete(thumbnailKey))
-                            .then(mediaMetadataRepository.delete(media));
+//                    return s3Util.s3AsyncDelete(videoKey)
+//                            .then(s3Util.s3AsyncDelete(thumbnailKey))
+//                            .then(mediaMetadataRepository.delete(media));
+                    // Step 1: Delete all likes for this media
+                    return mediaLikeRepository.deleteAllByMediaId(mediaId)
+                            // Step 2: Delete media metadata
+                            .then(mediaMetadataRepository.delete(media))
+                            // Step 3: Delete media from S3
+                            .then(s3Util.s3AsyncDelete(videoKey))
+                            // Step 4: Delete thumbnail from S3
+                            .then(s3Util.s3AsyncDelete(thumbnailKey));
+
                 });
     }
 
