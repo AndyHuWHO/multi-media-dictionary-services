@@ -51,4 +51,11 @@ public class MediaLikeController {
         return mediaLikeService.getLikedMediaIds(authUserId, mediaIds);
     }
 
+    @GetMapping("/likes/media-ids")
+    public Mono<List<String>> getLikedMediaIds(
+            @RequestHeader("X-Auth-UserId") String authUserId
+    ) {
+        return mediaLikeService.getLikedMediaIds(authUserId);
+    }
+
 }

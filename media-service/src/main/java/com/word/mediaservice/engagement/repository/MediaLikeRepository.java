@@ -9,15 +9,10 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface MediaLikeRepository extends ReactiveMongoRepository<MediaLike, String> {
-    Mono<Boolean> existsByAuthUserIdAndMediaId(String authUserId, String mediaId);
-
     Flux<MediaLike> findByAuthUserIdAndMediaIdIn(String authUserId, List<String> mediaIds);
-    
-    Mono<Void> deleteByAuthUserIdAndMediaId(String authUserId, String mediaId);
 
     Flux<MediaLike> findByMediaId(String mediaId);
-
-    Flux<MediaLike> findByAuthUserId(String authUserId);
+    Flux<MediaLike> findByAuthUserIdOrderByLikedAtDesc(String authUserId);
     Mono<Void> deleteAllByAuthUserId(String authUserId);
     Mono<Void> deleteAllByMediaId(String mediaId);
 }

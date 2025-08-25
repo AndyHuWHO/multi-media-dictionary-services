@@ -69,7 +69,7 @@ public class MediaLikeServiceImpl implements MediaLikeService{
 
     @Override
     public Flux<MediaMetadataResponseDTO> getLikedMedia(String authUserId, int page, int size) {
-        return mediaLikeRepository.findByAuthUserId(authUserId)
+        return mediaLikeRepository.findByAuthUserIdOrderByLikedAtDesc(authUserId)
                 .map(MediaLike::getMediaId)
                 .collectList()
                 .flatMapMany(allMediaIds -> {
@@ -86,6 +86,13 @@ public class MediaLikeServiceImpl implements MediaLikeService{
     public Mono<List<String>> getLikedMediaIds(String authUserId, List<String> mediaIds) {
         return mediaLikeRepository
                 .findByAuthUserIdAndMediaIdIn(authUserId, mediaIds)
+                .map(MediaLike::getMediaId)
+                .collectList();
+    }
+
+    @Override
+    public Mono<List<String>> getLikedMediaIds(String authUserId) {
+        return mediaLikeRepository.findByAuthUserIdOrderByLikedAtDesc(authUserId)
                 .map(MediaLike::getMediaId)
                 .collectList();
     }

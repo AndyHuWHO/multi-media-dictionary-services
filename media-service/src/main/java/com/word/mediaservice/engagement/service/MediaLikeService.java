@@ -12,4 +12,5 @@ public interface MediaLikeService {
 
     Flux<MediaMetadataResponseDTO> getLikedMedia(String authUserId, int page, int size);
     Mono<List<String>> getLikedMediaIds(String authUserId, List<String> mediaIds);
+    Mono<List<String>> getLikedMediaIds(String authUserId);
 }
