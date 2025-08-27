@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -174,6 +175,8 @@ public class MediaUploadServiceImp implements MediaUploadService {
                 .map(mediaMetadataMapper::toResponseDTO)
                 .collectList()
                 .map(list -> {
+                    // Guarantee deterministic order before shuffle
+                    list.sort(Comparator.comparing(MediaMetadataResponseDTO::getId));
                     long fixedSeed = 123;
                     Collections.shuffle(list, new Random(fixedSeed));
                     return list;
