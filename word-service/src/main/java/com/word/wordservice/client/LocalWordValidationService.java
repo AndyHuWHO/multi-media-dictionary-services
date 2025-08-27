@@ -25,7 +25,7 @@ public class LocalWordValidationService {
 
     private boolean loadFromSerializedFile() {
         try(ObjectInputStream in = new ObjectInputStream(
-                new ClassPathResource("data/dictionary.ser").getInputStream())
+                new ClassPathResource("data/dictionary1.ser").getInputStream())
         ) { Object obj = in.readObject();
             if (obj instanceof Set) {
                 englishWords = (Set<String>) obj;
