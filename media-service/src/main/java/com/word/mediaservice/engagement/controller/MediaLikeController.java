@@ -1,5 +1,6 @@
 package com.word.mediaservice.engagement.controller;
 
+import com.word.mediaservice.common.dto.PageResponseDTO;
 import com.word.mediaservice.engagement.service.MediaLikeService;
 import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +36,12 @@ public class MediaLikeController {
     }
 
     @GetMapping("/likes/user")
-    public Flux<MediaMetadataResponseDTO> getLikedMedia(
+    public Mono<PageResponseDTO<MediaMetadataResponseDTO>> getLikedMedia(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return mediaLikeService.getLikedMedia(authUserId, page, size);
+        return mediaLikeService.getLikedMediaPaged(authUserId, page, size);
     }
 
     @GetMapping("/likes/status")

@@ -16,9 +16,14 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
+import com.word.mediaservice.common.dto.PageResponseDTO;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MediaLikeServiceImpl implements MediaLikeService{
@@ -81,6 +86,49 @@ public class MediaLikeServiceImpl implements MediaLikeService{
                 })
                 .map(mediaMetadataMapper::toResponseDTO);
     }
+
+    @Override
+    public Mono<PageResponseDTO<MediaMetadataResponseDTO>> getLikedMediaPaged(String authUserId, int page, int size) {
+        Mono<Long> totalMono = mediaLikeRepository.countByAuthUserId(authUserId);
+
+        Mono<List<String>> allIdsMono = mediaLikeRepository.findByAuthUserIdOrderByLikedAtDesc(authUserId)
+                .map(MediaLike::getMediaId)
+                .collectList();
+
+        // Combine count and IDs, extract page, fetch and build response
+        return Mono.zip(totalMono, allIdsMono)
+                .flatMap(tuple -> {
+                    long total = tuple.getT1();
+                    List<String> allIds = tuple.getT2();
+
+                    int fromIndex = Math.min(page * size, allIds.size());
+                    int toIndex   = Math.min(fromIndex + size, allIds.size());
+                    List<String> pageIds = allIds.subList(fromIndex, toIndex);
+
+                    return mediaMetadataRepository.findAllById(pageIds)
+                            .collectList()
+                            .map(metadatas -> {
+                                Map<String, MediaMetadata> metadataById = metadatas.stream()
+                                        .collect(Collectors.toMap(MediaMetadata::getId, Function.identity()));
+                                List<MediaMetadataResponseDTO> orderedContent = pageIds.stream()
+                                        .map(metadataById::get)
+                                        .filter(Objects::nonNull)
+                                        .map(mediaMetadataMapper::toResponseDTO)
+                                        .toList();
+
+                                int totalPages = (int) Math.ceil((double) total / size);
+
+                                return PageResponseDTO.<MediaMetadataResponseDTO>builder()
+                                        .content(orderedContent)
+                                        .page(page)
+                                        .pageSize(size)
+                                        .totalPages(totalPages)
+                                        .build();
+                            });
+                });
+    }
+
+
 
     @Override
     public Mono<List<String>> getLikedMediaIds(String authUserId, List<String> mediaIds) {

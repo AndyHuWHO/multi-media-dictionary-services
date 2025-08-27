@@ -15,4 +15,5 @@ public interface MediaLikeRepository extends ReactiveMongoRepository<MediaLike, 
     Flux<MediaLike> findByAuthUserIdOrderByLikedAtDesc(String authUserId);
     Mono<Void> deleteAllByAuthUserId(String authUserId);
     Mono<Void> deleteAllByMediaId(String mediaId);
+    Mono<Long> countByAuthUserId(String authUserId);
 }
