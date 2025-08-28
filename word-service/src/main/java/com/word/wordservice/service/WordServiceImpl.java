@@ -24,6 +24,13 @@ public class WordServiceImpl implements WordService{
     @Override
     public Mono<WordEntry> lookupWord(String word) {
         String normalizedWord = word.toLowerCase();
+        if (word.equals("DictionVu")) {
+            return GPTWordEntryRepository.findByWord(word)
+                    .switchIfEmpty(
+                            openAiDictionaryClient.fetchDictionaryInfo(word)
+                                    .flatMap(GPTWordEntryRepository::save)
+                    );
+        }
         if (!localWordValidationService.isValidWord(normalizedWord)) {
             return Mono.error(new InvalidWordException(normalizedWord));
         }
