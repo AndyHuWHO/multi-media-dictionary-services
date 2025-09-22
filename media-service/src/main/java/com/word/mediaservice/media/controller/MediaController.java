@@ -37,9 +37,10 @@ public class MediaController {
     @PostMapping("/upload-url")
     @Operation(summary = "Generate upload URLs for media files")
     public Mono<ResponseEntity<GenerateUploadUrlResponseDTO>> generateUploadUrls(
-            @RequestHeader("X-Auth-UserId") String userId
+            @RequestHeader("X-Auth-UserId") String userId,
+            @RequestHeader("Content-Type") String contentType
     ) {
-        return mediaUploadService.generatePresignedUrls(userId)
+        return mediaUploadService.generatePresignedUrls(userId, contentType)
                 .map(ResponseEntity::ok);
     }
 

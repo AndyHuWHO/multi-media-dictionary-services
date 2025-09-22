@@ -35,8 +35,8 @@ public class S3Util {
     }
 
     // === Presigned PUT URLs ===
-    public String generateVideoUploadUrl(String objectKey) {
-        return generatePresignedPutUrl(objectKey, "video/quicktime");
+    public String generateVideoUploadUrl(String objectKey, String contentType) {
+        return generatePresignedPutUrl(objectKey, contentType == null ? "video/mp4" : contentType );
     }
 
     public String generateThumbnailUploadUrl(String objectKey) {

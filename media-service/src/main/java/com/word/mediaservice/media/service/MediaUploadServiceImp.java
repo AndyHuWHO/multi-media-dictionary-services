@@ -47,11 +47,11 @@ public class MediaUploadServiceImp implements MediaUploadService {
     }
 
     @Override
-    public Mono<GenerateUploadUrlResponseDTO> generatePresignedUrls(String authUserId) {
+    public Mono<GenerateUploadUrlResponseDTO> generatePresignedUrls(String authUserId, String contentType) {
         String videoKey = s3Util.buildVideoKey(authUserId);
         String thumbnailKey = s3Util.buildThumbnailKey(authUserId);
 
-        String videoUploadUrl = s3Util.generateVideoUploadUrl(videoKey);
+        String videoUploadUrl = s3Util.generateVideoUploadUrl(videoKey,contentType);
         String thumbnailUploadUrl = s3Util.generateThumbnailUploadUrl(thumbnailKey);
 
         GenerateUploadUrlResponseDTO response = GenerateUploadUrlResponseDTO.builder()

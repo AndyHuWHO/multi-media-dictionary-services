@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 public interface MediaUploadService {
     Mono<Void> validateMediaMetadata(MediaMetadataRequestDTO dto);
-    Mono<GenerateUploadUrlResponseDTO> generatePresignedUrls(String authUserId);
+    Mono<GenerateUploadUrlResponseDTO> generatePresignedUrls(String authUserId, String contentType);
     Mono<MediaMetadataResponseDTO> saveMediaMetadata(String authUserId, MediaMetadataRequestDTO requestDTO);
 
     Flux<MediaMetadataResponseDTO> getUserMedia(String authUserId, int page, int size);
