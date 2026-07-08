@@ -19,6 +19,29 @@ Make sure environment variables in the docker compose file are provided: OPENAI_
 docker compose up --build
 ```
 
+### API Documentation
+After the services are running, open Swagger UI through the API Gateway:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+The gateway Swagger UI provides a service selector for the available OpenAPI specs:
+
+- `user-service`
+- `word-service`
+- `media-service`
+
+Raw OpenAPI JSON is also available through the gateway:
+
+```text
+http://localhost:8080/user/v3/api-docs
+http://localhost:8080/words/v3/api-docs
+http://localhost:8080/media/v3/api-docs
+```
+
+The gateway serves the Swagger UI page and forwards each OpenAPI JSON request to the corresponding service inside the Docker network. In the default Docker Compose setup, use gateway port `8080` instead of direct service ports.
+
 ---
 
 ## 🔐 Auth Endpoints (`/api/auth`)
@@ -600,7 +623,6 @@ docker run -p 8080:8080 \
 Retrieve dictionary information for the specified word.
 
 ---
-
 
 
 
