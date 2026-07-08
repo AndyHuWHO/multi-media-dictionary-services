@@ -8,7 +8,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM openjdk:21-jdk-slim AS runtime
+FROM eclipse-temurin:21-jre AS runtime
 WORKDIR /app
 # Copy the built artifact from build stage
 COPY --from=build /app/target/*.jar app.jar
