@@ -26,14 +26,18 @@ public class AuthenticationFilter  implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // Skip auth-service and word-service
-        if (path.startsWith("/api/auth/") ||
+        if (    path.startsWith("/api/auth/") ||
                 path.startsWith("/api/words/") ||
                 path.startsWith("/api/media/word/") ||
                 path.startsWith("/api/media/feed") ||
                 path.startsWith("/api/user/profile/visit") ||
                 path.startsWith("/words/v3/api-docs") ||
                 path.startsWith("/user/v3/api-docs") ||
-                path.startsWith("/media/v3/api-docs")) {
+                path.startsWith("/media/v3/api-docs") ||
+                path.startsWith("/swagger-ui/") ||
+                path.equals("/swagger-ui.html") ||
+                path.startsWith("/v3/api-docs")
+        ) {
             return chain.filter(exchange);
         }
 

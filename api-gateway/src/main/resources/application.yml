@@ -16,6 +16,16 @@ spring:
   application:
     name: api-gateway
 
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: user-service
+        url: /user/v3/api-docs
+      - name: word-service
+        url: /words/v3/api-docs
+      - name: media-service
+        url: /media/v3/api-docs
 #  cloud:
 #    gateway:
 #      server:
