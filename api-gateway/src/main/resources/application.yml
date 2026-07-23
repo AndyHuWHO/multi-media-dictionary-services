@@ -3,14 +3,23 @@ server:
 jwt:
   secret: ${JWT_SECRET:RRB0+Gr6EGjziACoFoKUWeSJQzIGfxTaGNplpO0tkNY=}
 
+#auth:
+#  url: http://localhost:8081
+#word:
+#  url: http://localhost:8083
+#user:
+#  url: http://localhost:8082
+#media:
+#  url: http://localhost:8084
+
 auth:
-  url: http://localhost:8081
+  url: ${AUTH_URL:http://localhost:8081}
 word:
-  url: http://localhost:8083
+  url: ${WORD_URL:http://localhost:8083}
 user:
-  url: http://localhost:8082
+  url: ${USER_URL:http://localhost:8082}
 media:
-  url: http://localhost:8084
+  url: ${MEDIA_URL:http://localhost:8084}
 
 spring:
   application:
