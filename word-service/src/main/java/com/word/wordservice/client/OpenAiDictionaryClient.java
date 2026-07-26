@@ -45,7 +45,12 @@ public class OpenAiDictionaryClient {
                 .map(OpenAIResponse::getFirstMessageContent)
                 .map(content -> {
                     try {
-                        return objectMapper.readValue(content, WordEntry.class);
+                        WordEntry wordEntry =
+                                objectMapper.readValue(content, WordEntry.class);
+
+                        wordEntry.setWord(word.toLowerCase());
+
+                        return wordEntry;
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to parse GPT response into WordEntry", e);
                     }
