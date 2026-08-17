@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 import java.time.Duration;
+import java.util.UUID;
 
 @Component
 public class S3Util {
@@ -69,7 +70,8 @@ public class S3Util {
 
     private String buildKey(String userId, String type, String extension) {
         long timestamp = System.currentTimeMillis();
-        return String.format("media/%s/%s_%d.%s", userId, type, timestamp, extension);
+        String uuid = UUID.randomUUID().toString();
+        return String.format("media/%s/%s_%d_%s.%s", userId, type, timestamp, uuid, extension);
     }
 
     public String generatePresignedGetUrl(String objectKey) {

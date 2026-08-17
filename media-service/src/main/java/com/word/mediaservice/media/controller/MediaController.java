@@ -1,10 +1,9 @@
 package com.word.mediaservice.media.controller;
 
 import com.word.mediaservice.common.dto.PageResponseDTO;
-import com.word.mediaservice.media.dto.GenerateUploadUrlResponseDTO;
-import com.word.mediaservice.media.dto.MediaMetadataRequestDTO;
-import com.word.mediaservice.media.dto.MediaMetadataResponseDTO;
-import com.word.mediaservice.media.dto.MediaMetadataUpdateRequestDTO;
+import com.word.mediaservice.media.dto.*;
+import com.word.mediaservice.media.service.MediaManagementService;
+import com.word.mediaservice.media.service.MediaQueryService;
 import com.word.mediaservice.media.service.MediaUploadService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,30 +18,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Media", description = "Media API")
 public class MediaController {
     private final MediaUploadService mediaUploadService;
+    private final MediaQueryService mediaQueryService;
+    private final MediaManagementService mediaManagementService;
 
-    public MediaController(MediaUploadService mediaUploadService) {
+    public MediaController(MediaUploadService mediaUploadService,
+                           MediaQueryService mediaQueryService,
+                           MediaManagementService mediaManagementService) {
         this.mediaUploadService = mediaUploadService;
+        this.mediaQueryService = mediaQueryService;
+        this.mediaManagementService = mediaManagementService;
     }
 
-    @PostMapping("/validate")
-    @Operation(summary = "Validate metadata before uploading")
-    public Mono<ResponseEntity<Void>> validateMetadata(
-            @Valid @RequestBody MediaMetadataRequestDTO requestDTO
+
+    @PostMapping("/upload/initiate")
+    @Operation(summary = "Initiate media upload, validate metadata and get upload urls")
+    public Mono<ResponseEntity<GenerateUploadUrlResponseDTO>> initiateMediaUpload(
+            @RequestHeader("X-Auth-UserId") String authUserId,
+            @Valid @RequestBody InitiateMediaUploadRequestDTO request
     ) {
-        // If validation passes, just return 204 No Content
-        return mediaUploadService.validateMediaMetadata(requestDTO)
-                .thenReturn(ResponseEntity.noContent().build());
+        return mediaUploadService.generatePresignedUrls(
+                authUserId,
+                request.getVideoContentType()
+        ).map(ResponseEntity::ok);
     }
 
-    @PostMapping("/upload-url")
-    @Operation(summary = "Generate upload URLs for media files")
-    public Mono<ResponseEntity<GenerateUploadUrlResponseDTO>> generateUploadUrls(
-            @RequestHeader("X-Auth-UserId") String userId,
-            @RequestHeader("Content-Type") String contentType
-    ) {
-        return mediaUploadService.generatePresignedUrls(userId, contentType)
-                .map(ResponseEntity::ok);
-    }
 
     @PostMapping
     @Operation(summary = "Upload media-metadata")
@@ -60,7 +59,7 @@ public class MediaController {
             @RequestHeader("X-Auth-UserId") String authUserId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return mediaUploadService.getUserMedia(authUserId, page, size);
+        return mediaQueryService.getUserMedia(authUserId, page, size);
     }
 
     @GetMapping("/user/{userId}")
@@ -70,27 +69,8 @@ public class MediaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return mediaUploadService.getPublicMediaByUser(userId, page, size);
+        return mediaQueryService.getPublicMediaByUser(userId, page, size);
     }
-
-//    @GetMapping("/word/{word}")
-//    @Operation(summary = "Get media by word")
-//    public Flux<MediaMetadataResponseDTO> getPublicMediaByWord(
-//            @PathVariable String word,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size
-//    ) {
-//        return mediaUploadService.getPublicMediaByWord(word, page, size);
-//    }
-//
-//    @GetMapping("/feed")
-//    @Operation(summary = "Get the latest and most interacted media feed")
-//    public Flux<MediaMetadataResponseDTO> getFeed(
-//            @RequestParam(defaultValue = "0") int page) {
-//        return mediaUploadService.getFeed(page);
-//    }
-
-    // ...imports and annotations remain unchanged
 
     @GetMapping("/word/{word}")
     @Operation(summary = "Get media by word (paged)")
@@ -99,7 +79,7 @@ public class MediaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return mediaUploadService.getPublicMediaByWordPaged(word, page, size)
+        return mediaQueryService.getPublicMediaByWordPaged(word, page, size)
                 .map(ResponseEntity::ok);
     }
 
@@ -108,10 +88,9 @@ public class MediaController {
     public Mono<ResponseEntity<PageResponseDTO<MediaMetadataResponseDTO>>> getFeedPaged(
             @RequestParam(defaultValue = "0") int page
     ) {
-        return mediaUploadService.getFeedPaged(page)
+        return mediaQueryService.getFeedPaged(page)
                 .map(ResponseEntity::ok);
     }
-
 
 
 
@@ -121,7 +100,7 @@ public class MediaController {
             @RequestHeader("X-Auth-UserId") String authUserId,
             @PathVariable String mediaId,
             @Valid @RequestBody MediaMetadataUpdateRequestDTO dto) {
-        return mediaUploadService.updateMediaMetadata(authUserId, mediaId, dto)
+        return mediaManagementService.updateMediaMetadata(authUserId, mediaId, dto)
                 .map(ResponseEntity::ok);
     }
 
@@ -130,7 +109,7 @@ public class MediaController {
     public Mono<ResponseEntity<Void>> deleteMedia(
             @RequestHeader("X-Auth-UserId") String authUserId,
             @PathVariable String mediaId) {
-        return mediaUploadService.deleteMedia(authUserId, mediaId)
+        return mediaManagementService.deleteMedia(authUserId, mediaId)
                 .thenReturn(ResponseEntity.noContent().build());
     }
 }

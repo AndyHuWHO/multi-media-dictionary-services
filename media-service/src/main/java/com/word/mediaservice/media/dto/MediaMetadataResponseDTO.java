@@ -11,7 +11,6 @@ import java.util.List;
 @Builder
 public class MediaMetadataResponseDTO {
     private String id;
-
     private String authUserId;
 
     private String objectPresignedGetUrl;
